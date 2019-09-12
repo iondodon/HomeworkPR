@@ -1,32 +1,32 @@
-#!/usr/bin/python3
-
 import requests
 import json
 
-response = requests.get('http://localhost:5000/register')
 
-json_data = response.content.decode('utf8').replace("'", '"')
-print(json_data + '\n')
+def get_token():
+    response = requests.get('http://localhost:5000/register')
 
-data = json.loads(json_data)
-print(data)
-print('\n') 
+    json_str = response.content.decode('utf8')
+    json_dict = json.loads(json_str)
 
-s = json.dumps(data, indent=4, sort_keys=True)
-print(s + '\n')
-
-for key, value in data.items():
-    if key == "access_token" in data:
-        token = value
-        print(token)
+    for key, value in json_dict.items():
+        if key == 'access_token':
+            return value
 
 
-response = requests.get(
-    'http://localhost:5000/home',
-    params={'q': 'requests+language:python'},
-    headers={'X-Access-Token': token},
-)
-print(response)
+def parse(route):
+    print(route)
+    response = requests.get('http://localhost:5000' + route, headers={'X-Access-Token': token})
 
-json_data = response.content.decode('utf8').replace("'", '"')
-print(json_data)
+    json_str = response.content.decode('utf8')
+    json_dict = json.loads(json_str)
+
+    links = json_dict['link']
+    for key in links.keys():
+        parse(links[key])
+
+    print('\n')
+
+
+token = get_token()
+if token:
+    parse('/home')

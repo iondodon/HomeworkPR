@@ -4,7 +4,7 @@ import math
 
 
 def calc():
-    for i in range(0, 4000000):
+    for i in range(0, 40000000000):
         math.sqrt(i)
 
 
