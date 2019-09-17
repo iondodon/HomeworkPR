@@ -1,0 +1,11 @@
+/route/1     : application/json
+/route/2     : text/csv
+/route/3     : none 
+/route/1/2   : text/csv
+/route/1/1   : application/json
+/route/3/1   : application/yaml
+/route/3/2   : text/csv
+/route/3/3   : text/csv
+/route/3/3/1 : text/csv
+/route/3/3/2 : none
+/route/4     : none

@@ -1,2 +1,6 @@
 datele de adus intr-un format comun
 de format un server care da aceste date inapoi
+maybe thread pool
+de creat tcp server care transmite datale inapoi,
+prima ruta - selectie pe baza de coloane
+a doua ruta - selectie pe baza de regex
