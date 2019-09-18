@@ -2,15 +2,23 @@ from threading import Thread
 import requests
 import json
 import time
+import xmltodict
+import csv
 
-data = {}
+store = {}
 threads = []
 token = ''
 
 
-def convert_and_store(mime_type):
+def convert_and_store(route, mime_type, json_dict):
     print(mime_type)
-    return
+    data = json_dict['data']
+    if mime_type == 'application/xml':
+        store[route] = xmltodict.parse(data)
+    elif mime_type == 'text/csv':
+        store[route] = csv.reader(data)
+    # else:
+    #     store[route] = json.load(data)
 
 
 def get_token():
@@ -33,8 +41,10 @@ def parse(route):
     json_str = response.content.decode('utf8')
     json_dict = json.loads(json_str)
 
+    print(json_str)
+
     if 'mime_type' in json_dict.keys():
-        convert_and_store(json_dict['mime_type'])
+        convert_and_store(route, json_dict['mime_type'], json_dict)
 
     for key in json_dict.keys():
         if key == 'link':
@@ -58,3 +68,6 @@ for thread in threads:
 
 end_time = time.time()
 print(end_time - start_time)
+print(len(store))
+
+print(store['/route/1/1'])
