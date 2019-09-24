@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9fccaa1c-30a5-4f06-bf53-c9a7cdf09168" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/ion.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/ion.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab1/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab1/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab1/help_file" beforeDir="false" afterPath="$PROJECT_DIR$/lab1/help_file" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -115,7 +113,7 @@
       <workItem from="1568782508964" duration="3997000" />
       <workItem from="1568797286298" duration="4156000" />
       <workItem from="1568958584191" duration="119000" />
-      <workItem from="1569335849258" duration="8266000" />
+      <workItem from="1569335849258" duration="9569000" />
     </task>
     <servers />
   </component>

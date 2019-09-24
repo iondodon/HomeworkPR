@@ -1,11 +1,12 @@
 from threading import Thread
+import pprint
 import requests
 import json
 
 import xml.etree.ElementTree as ET
 import csv
 
-store = {}
+store = []
 items = 0
 threads = []
 token = ''
@@ -24,12 +25,17 @@ def get_token():
             return token
 
 
+def add_column():
+    pass
+
+
 def store_xml(xmldata_string):
     tree = ET.fromstring(xmldata_string)
     for record in tree:
-        print(record)
+        item = {}
         for field in record:
-            print(field.tag + ' : ' + field.text)
+            item[field.tag] = field.text
+        store.append(item)
 
 
 def store_csv(csvdata_string):
@@ -39,7 +45,10 @@ def store_csv(csvdata_string):
     with open('help_file', mode='r', newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            print(row)
+            item = {}
+            for key in row:
+                item[key] = row[key]
+            store.append(item)
 
 
 def convert_and_store(mime_type, json_dict):
@@ -47,8 +56,8 @@ def convert_and_store(mime_type, json_dict):
     print(data)
     if mime_type == 'application/xml':
         store_xml(data)
-    # if mime_type == 'text/csv':
-    #     store_csv(data)
+    if mime_type == 'text/csv':
+        store_csv(data)
 
 
 def parse(route):
@@ -75,3 +84,6 @@ if get_token():
 
 for thread in threads:
     thread.join()
+
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint(store)
