@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 import csv
 
 store = {}
+items = 0
 threads = []
 token = ''
 
@@ -24,13 +25,11 @@ def get_token():
 
 
 def store_xml(xmldata_string):
-    with open('help_file', mode='w', newline='') as xmlfile:
-        xmlfile.write(xmldata_string)
-
-    with open('help_file', mode='r', newline='') as xmlfile:
-        tree = ET.parse(xmlfile)
-        root = tree.getroot()
-        print(root)
+    tree = ET.fromstring(xmldata_string)
+    for record in tree:
+        print(record)
+        for field in record:
+            print(field.tag + ' : ' + field.text)
 
 
 def store_csv(csvdata_string):
@@ -43,12 +42,13 @@ def store_csv(csvdata_string):
             print(row)
 
 
-def convert_and_store(route, mime_type, json_dict):
+def convert_and_store(mime_type, json_dict):
     data = json_dict['data']
+    print(data)
     if mime_type == 'application/xml':
         store_xml(data)
-    if mime_type == 'text/csv':
-        store_csv(data)
+    # if mime_type == 'text/csv':
+    #     store_csv(data)
 
 
 def parse(route):
@@ -58,7 +58,7 @@ def parse(route):
     json_dict = json.loads(json_str)
 
     if 'mime_type' in json_dict.keys():
-        convert_and_store(route, json_dict['mime_type'], json_dict)
+        convert_and_store(json_dict['mime_type'], json_dict)
 
     for key in json_dict.keys():
         if key == 'link':
