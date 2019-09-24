@@ -2,22 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9fccaa1c-30a5-4f06-bf53-c9a7cdf09168" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lab1/help_file" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Homework.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Homework.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/ion.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/ion.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab1/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab1/.idea/lab1.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab1/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab1/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab1/.idea/workspace.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/lab1/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab1/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab1/processes.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab1/processes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab1/threads.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab1/threads.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/multithreading/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/multithreading/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/multithreading/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/multithreading/.idea/multithreading.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/multithreading/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/multithreading/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/multithreading/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab1/routes" beforeDir="false" afterPath="$PROJECT_DIR$/lab1/routes" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -36,6 +28,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1Qbb5qrzp5M4WSI5EAqMZu4Muzt" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -46,6 +39,7 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -67,13 +61,35 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="$PROJECT_DIR$/../../CS/Homework/Homework/bin/python" />
+      <option name="SDK_HOME" value="/usr/bin/python3.6" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="client" type="PythonConfigurationType" factoryName="Python">
+      <module name="Homework" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/bin/python3.6" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/lab1" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/lab1/client.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -96,7 +112,14 @@
       <workItem from="1568042063773" duration="1350000" />
       <workItem from="1568043569078" duration="38000" />
       <workItem from="1568210074726" duration="2848000" />
-      <workItem from="1568300329804" duration="5756000" />
+      <workItem from="1568300329804" duration="7053000" />
+      <workItem from="1568353066890" duration="59000" />
+      <workItem from="1568612064911" duration="10757000" />
+      <workItem from="1568735273475" duration="5443000" />
+      <workItem from="1568782508964" duration="3997000" />
+      <workItem from="1568797286298" duration="4156000" />
+      <workItem from="1568958584191" duration="119000" />
+      <workItem from="1569335849258" duration="4349000" />
     </task>
     <servers />
   </component>
@@ -115,5 +138,8 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/HomeworkPR$client.coverage" NAME="client Coverage Results" MODIFIED="1568799048980" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/lab1" />
   </component>
 </project>
