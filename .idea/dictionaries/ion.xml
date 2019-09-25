@@ -4,9 +4,11 @@
       <w>bfnrt</w>
       <w>csvdata</w>
       <w>csvfile</w>
+      <w>jsondata</w>
       <w>thrd</w>
       <w>xmldata</w>
       <w>xmlfile</w>
+      <w>yamldata</w>
     </words>
   </dictionary>
 </component>

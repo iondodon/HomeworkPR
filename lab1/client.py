@@ -2,7 +2,8 @@ from threading import Thread
 import pprint
 import requests
 import json
-
+import yaml
+import re
 import xml.etree.ElementTree as ET
 import csv
 
@@ -10,6 +11,7 @@ store = []
 items = 0
 threads = []
 token = ''
+pp = pprint.PrettyPrinter(indent=4)
 
 
 def get_token():
@@ -23,10 +25,6 @@ def get_token():
         if key == 'access_token':
             token = value
             return token
-
-
-def add_column():
-    pass
 
 
 def store_xml(xmldata_string):
@@ -51,13 +49,31 @@ def store_csv(csvdata_string):
             store.append(item)
 
 
-def convert_and_store(mime_type, json_dict):
+def store_yaml(yamldata_string):
+    data = yaml.load(yamldata_string)
+    for item in data:
+        store.append(item)
+
+
+def store_json(jsondata_string):
+    regex = r'''(?<=[}\]"']),(?!\s*[{["'])'''
+    jsondata_string = re.sub(regex, "", jsondata_string, 0)
+
+    json_list = json.loads(jsondata_string)
+    for item in json_list:
+        store.append(item)
+
+
+def convert_and_store(json_dict, mime_type='application/json'):
     data = json_dict['data']
-    print(data)
     if mime_type == 'application/xml':
         store_xml(data)
-    if mime_type == 'text/csv':
+    elif mime_type == 'text/csv':
         store_csv(data)
+    elif mime_type == 'application/x-yaml':
+        store_yaml(data)
+    elif mime_type == 'application/json':
+        store_json(data)
 
 
 def parse(route):
@@ -66,8 +82,11 @@ def parse(route):
     json_str = response.content.decode('utf8')
     json_dict = json.loads(json_str)
 
-    if 'mime_type' in json_dict.keys():
-        convert_and_store(json_dict['mime_type'], json_dict)
+    if 'data' in json_dict.keys():
+        if 'mime_type' in json_dict.keys():
+            convert_and_store(json_dict, json_dict['mime_type'])
+        else:
+            convert_and_store(json_dict)
 
     for key in json_dict.keys():
         if key == 'link':
@@ -85,5 +104,4 @@ if get_token():
 for thread in threads:
     thread.join()
 
-pp = pprint.PrettyPrinter(indent=4)
 pp.pprint(store)
