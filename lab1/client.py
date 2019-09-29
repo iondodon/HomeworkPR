@@ -66,6 +66,7 @@ def store_json(jsondata_string):
 
 def convert_and_store(json_dict, mime_type='application/json'):
     data = json_dict['data']
+
     if mime_type == 'application/xml':
         store_xml(data)
     elif mime_type == 'text/csv':
@@ -84,9 +85,13 @@ def parse(route):
 
     if 'data' in json_dict.keys():
         if 'mime_type' in json_dict.keys():
-            convert_and_store(json_dict, json_dict['mime_type'])
+            thrd = Thread(target=convert_and_store, args=[json_dict, json_dict['mime_type']])
+            threads.append(thrd)
+            thrd.start()
         else:
-            convert_and_store(json_dict)
+            thrd = Thread(target=convert_and_store, args=[json_dict])
+            threads.append(thrd)
+            thrd.start()
 
     for key in json_dict.keys():
         if key == 'link':
