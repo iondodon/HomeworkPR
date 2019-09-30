@@ -15,7 +15,14 @@ pp = pprint.PrettyPrinter(indent=4)
 
 
 def get_token():
-    response = requests.get('http://localhost:5000/register')
+    response = None
+    try:
+        response = requests.get('http://localhost:5000/register')
+    except requests.ConnectionError as e:
+        print(e)
+
+    if not response:
+        return
 
     json_str = response.content.decode('utf8')
     json_dict = json.loads(json_str)
@@ -78,7 +85,14 @@ def convert_and_store(json_dict, mime_type='application/json'):
 
 
 def parse(route):
-    response = requests.get('http://localhost:5000' + route, headers={'X-Access-Token': token})
+    response = None
+    try:
+        response = requests.get('http://localhost:5000' + route, headers={'X-Access-Token': token})
+    except requests.ConnectionError as e:
+        print(e)
+
+    if not response:
+        return
 
     json_str = response.content.decode('utf8')
     json_dict = json.loads(json_str)
