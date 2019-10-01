@@ -1,7 +1,6 @@
-id,username,email,created_account_data
-11,ncowopea,bedisa@soup.io,3/11/2019
-13,twickeyc,vlowsonc@privacy.gov.au,7/26/2019
-14,ebastind,bfarrearsd@ca.gov,12/20/2018
-17,shenningtong,blumberg@paypal.com,11/26/2018
-18,vgioanih,iandreoneh@hubpages.com,6/18/2019
-19,rbeckinghami,rrockelli@shop-pro.jp,3/25/2019
+id,first_name,last_name,email,gender,ip_address
+2,Rosette,Borg,rborg1@howstuffworks.com,Female,136.40.51.238
+4,Heath,Siberry,hsiberry3@sciencedaily.com,Female,18.4.160.48
+5,Ethelbert,Havill,ehavill4@webmd.com,Male,72.177.185.174
+6,Luce,Hellard,lhellard5@zimbio.com,Male,142.222.82.249
+10,Court,Munn,cmunn9@pagesperso-orange.fr,Male,213.122.242.170

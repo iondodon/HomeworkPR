@@ -1,5 +1,4 @@
 from threading import Thread
-import pprint
 import requests
 import json
 import yaml
@@ -11,7 +10,6 @@ store = []
 items = 0
 threads = []
 token = ''
-pp = pprint.PrettyPrinter(indent=4)
 
 
 def get_token():
@@ -122,5 +120,3 @@ if get_token():
 
 for thread in threads:
     thread.join()
-
-pp.pprint(store)
