@@ -1,6 +1,8 @@
-# from grabber import store
+from grabber import store
 import socket
 from threading import Thread
+import json
+import fnmatch
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = "localhost"
@@ -10,6 +12,26 @@ server_socket.bind((host, port))
 server_socket.listen()
 
 threads = []
+
+
+def process_query(query_dict):
+    result = []
+
+    if query_dict['type'] == 'select':
+        column_name = query_dict['column_name']
+        for entity in store:
+            if column_name in entity.keys():
+                result.append(entity[column_name])
+
+    if query_dict['glob_pattern']:
+        glob_pattern = query_dict['glob_pattern']
+        new_result = []
+        for value in result:
+            if fnmatch.fnmatch(value, glob_pattern):
+                new_result.append(value)
+        result = new_result
+
+    return result
 
 
 def wait_for_request():
@@ -23,10 +45,12 @@ def wait_for_request():
         threads.append(thrd)
         thrd.start()
 
-        msg_received = client_socket.recv(1024)
-        print(msg_received.decode('ascii'))
+        request_json_string = client_socket.recv(1024)
+        request_dict = json.loads(request_json_string.decode('ascii'))
+        query_result_dict = process_query(request_dict)
+        query_result_json = json.dumps(query_result_dict)
 
-        client_socket.send(str('msg back').encode())
+        client_socket.send(str(query_result_json).encode())
     except Exception as e:
         print(e)
 
