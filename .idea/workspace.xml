@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9fccaa1c-30a5-4f06-bf53-c9a7cdf09168" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/ion.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/ion.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab1/help_file" beforeDir="false" afterPath="$PROJECT_DIR$/lab1/help_file" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab1/tcp_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab1/tcp_client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab1/tcp_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab1/tcp_server.py" afterDir="false" />
     </list>
@@ -158,7 +156,12 @@
       <workItem from="1569937433612" duration="39000" />
       <workItem from="1569940626928" duration="8461000" />
       <workItem from="1570005159650" duration="3906000" />
-      <workItem from="1570009397225" duration="6859000" />
+      <workItem from="1570009397225" duration="7087000" />
+      <workItem from="1570370391201" duration="2951000" />
+      <workItem from="1570377237648" duration="3275000" />
+      <workItem from="1570469034071" duration="728000" />
+      <workItem from="1570522614334" duration="704000" />
+      <workItem from="1570609468718" duration="2719000" />
     </task>
     <servers />
   </component>

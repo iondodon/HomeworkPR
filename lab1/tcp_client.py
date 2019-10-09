@@ -5,7 +5,7 @@ import json
 threads = []
 sockets = []
 
-host = "localhost"
+host = "127.0.0.1"
 port = 9999
 
 
@@ -13,7 +13,7 @@ def make_request(index):
     client_socket = sockets[index]
     client_socket.connect((host, port))
 
-    request_dict = {'type': 'select', 'column_name': 'username', 'glob_pattern': '*mi'}
+    request_dict = {'type': 'select', 'column_name': 'username'}
     request_json = json.dumps(request_dict)
     client_socket.send(request_json.encode())
 

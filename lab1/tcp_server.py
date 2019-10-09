@@ -5,7 +5,7 @@ import json
 import fnmatch
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host = "localhost"
+host = "127.0.0.1"
 port = 9999
 
 server_socket.bind((host, port))
@@ -22,8 +22,8 @@ def process_query(query_dict):
         for entity in store:
             if column_name in entity.keys():
                 result.append(entity[column_name])
-
-    if query_dict['glob_pattern']:
+    
+    if 'glob_pattern' in query_dict.keys():
         glob_pattern = query_dict['glob_pattern']
         new_result = []
         for value in result:
