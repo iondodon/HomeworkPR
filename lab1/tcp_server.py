@@ -1,17 +1,11 @@
-from grabber import store
+import grabber
 import socket
 from threading import Thread
 import json
 import fnmatch
 
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host = "127.0.0.1"
-port = 9999
-
-server_socket.bind((host, port))
-server_socket.listen()
-
-threads = []
+THREADS = []
+STORE = grabber.grab_data()
 
 
 def process_query(query_dict):
@@ -19,10 +13,10 @@ def process_query(query_dict):
 
     if query_dict['type'] == 'select':
         column_name = query_dict['column_name']
-        for entity in store:
+        for entity in STORE:
             if column_name in entity.keys():
                 result.append(entity[column_name])
-    
+
     if 'glob_pattern' in query_dict.keys():
         glob_pattern = query_dict['glob_pattern']
         new_result = []
@@ -34,15 +28,15 @@ def process_query(query_dict):
     return result
 
 
-def wait_for_request():
+def wait_for_request(server_socket):
     try:
-        print("Listening on port " + str(port))
+        print('Listening...')
         client_socket, client_addr = server_socket.accept()
-        print("Got a connection from %s" % str(client_addr))
+        print('Got a connection from %s' % str(client_addr))
 
-        # prepare thread for the next request
-        thrd = Thread(target=wait_for_request, args=[])
-        threads.append(thrd)
+        # prepare a new thread for the next request
+        thrd = Thread(target=wait_for_request, args=[server_socket])
+        THREADS.append(thrd)
         thrd.start()
 
         request_json_string = client_socket.recv(1024)
@@ -55,9 +49,20 @@ def wait_for_request():
         print(e)
 
 
-wait_for_request()
+def serve():
+    global THREADS
 
-for thread in threads:
-    thread.join()
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind(('localhost', 9999))
+    server_socket.listen()
 
-server_socket.close()
+    wait_for_request(server_socket)
+
+    for thread in THREADS:
+        thread.join()
+
+    server_socket.close()
+
+
+if __name__ == '__main__':
+    serve()
