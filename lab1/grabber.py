@@ -119,4 +119,8 @@ def grab_data():
     for thread in THREADS:
         thread.join()
 
+    for i in range(len(STORE)):
+        for key in STORE[i].keys():
+            STORE[i][key] = str(STORE[i][key])
+
     return STORE
