@@ -4,10 +4,8 @@ from threading import Thread
 import json
 import fnmatch
 
-STORE = grabber.grab_data()
 
-
-def process_query(query_dict):
+def process_query(query_dict, STORE):
     result = []
 
     if query_dict['type'] == 'select':
@@ -27,20 +25,20 @@ def process_query(query_dict):
     return result
 
 
-def wait_for_request(server_socket, THREADS):
+def wait_for_request(server_socket, THREADS, STORE):
     try:
         print('Listening...')
         client_socket, client_addr = server_socket.accept()
         print('Got a connection from %s' % str(client_addr))
 
         # prepare a new thread for the next request
-        thrd = Thread(target=wait_for_request, args=(server_socket, THREADS))
+        thrd = Thread(target=wait_for_request, args=(server_socket, THREADS, STORE))
         THREADS.append(thrd)
         thrd.start()
 
         request_json_string = client_socket.recv(1024)
         request_dict = json.loads(request_json_string.decode('ascii'))
-        query_result_dict = process_query(request_dict)
+        query_result_dict = process_query(request_dict, STORE)
         query_result_json = json.dumps(query_result_dict)
 
         client_socket.send(str(query_result_json).encode())
@@ -50,12 +48,13 @@ def wait_for_request(server_socket, THREADS):
 
 def serve():
     THREADS = []
+    STORE = grabber.grab_data()
 
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind(('localhost', 9999))
     server_socket.listen()
 
-    wait_for_request(server_socket, THREADS)
+    wait_for_request(server_socket, THREADS, STORE)
 
     for thread in THREADS:
         thread.join()
