@@ -24,7 +24,7 @@ def run_requests():
     for i in range(1):
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         SOCKETS.append(client_socket)
-        thrd = Thread(target=make_request, args=[client_socket, sys.argv[1]])
+        thrd = Thread(target=make_request, args=(client_socket, sys.argv[1]))
         THREADS.append(thrd)
         thrd.start()
 

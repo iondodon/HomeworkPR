@@ -112,7 +112,7 @@ def grab_data():
     TOKEN = get_token()
 
     if TOKEN:
-        thread = Thread(target=parse, args=['/home', STORE, THREADS, TOKEN])
+        thread = Thread(target=parse, args=('/home', STORE, THREADS, TOKEN))
         THREADS.append(thread)
         thread.start()
 
