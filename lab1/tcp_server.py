@@ -4,7 +4,6 @@ from threading import Thread
 import json
 import fnmatch
 
-THREADS = []
 STORE = grabber.grab_data()
 
 
@@ -28,7 +27,7 @@ def process_query(query_dict):
     return result
 
 
-def wait_for_request(server_socket):
+def wait_for_request(server_socket, THREADS):
     try:
         print('Listening...')
         client_socket, client_addr = server_socket.accept()
@@ -50,13 +49,13 @@ def wait_for_request(server_socket):
 
 
 def serve():
-    global THREADS
+    THREADS = []
 
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind(('localhost', 9999))
     server_socket.listen()
 
-    wait_for_request(server_socket)
+    wait_for_request(server_socket, THREADS)
 
     for thread in THREADS:
         thread.join()
