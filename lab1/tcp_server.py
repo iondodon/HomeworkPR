@@ -34,7 +34,7 @@ def wait_for_request(server_socket, THREADS):
         print('Got a connection from %s' % str(client_addr))
 
         # prepare a new thread for the next request
-        thrd = Thread(target=wait_for_request, args=[server_socket])
+        thrd = Thread(target=wait_for_request, args=(server_socket, THREADS))
         THREADS.append(thrd)
         thrd.start()
 

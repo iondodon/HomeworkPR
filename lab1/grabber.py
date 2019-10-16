@@ -6,10 +6,6 @@ import re
 import xml.etree.ElementTree as ET
 import csv
 
-STORE = None
-THREADS = None
-TOKEN = None
-
 
 def safe_request(route, headers):
     response = None
@@ -33,9 +29,7 @@ def get_token():
             return value
 
 
-def store_xml(xmldata_string):
-    global STORE
-
+def store_xml(xmldata_string, STORE):
     tree = ET.fromstring(xmldata_string)
     for record in tree:
         item = {}
@@ -44,9 +38,7 @@ def store_xml(xmldata_string):
         STORE.append(item)
 
 
-def store_csv(csvdata_string):
-    global STORE
-
+def store_csv(csvdata_string, STORE):
     with open('help_file', mode='w', newline='') as csvfile:
         csvfile.write(csvdata_string)
 
@@ -59,16 +51,13 @@ def store_csv(csvdata_string):
             STORE.append(item)
 
 
-def store_yaml(yamldata_string):
-    global STORE
-
+def store_yaml(yamldata_string, STORE):
     data = yaml.load(yamldata_string)
     for item in data:
         STORE.append(item)
 
 
-def store_json(jsondata_string):
-    global STORE
+def store_json(jsondata_string, STORE):
 
     regex = r'''(?<=[}\]"']),(?!\s*[{["'])'''
     jsondata_string = re.sub(regex, "", jsondata_string, 0)
@@ -78,22 +67,20 @@ def store_json(jsondata_string):
         STORE.append(item)
 
 
-def convert_and_store(json_dict, mime_type='application/json'):
+def convert_and_store(json_dict, STORE, mime_type='application/json',):
     data = json_dict['data']
 
     if mime_type == 'application/xml':
-        store_xml(data)
+        store_xml(data, STORE)
     elif mime_type == 'text/csv':
-        store_csv(data)
+        store_csv(data, STORE)
     elif mime_type == 'application/x-yaml':
-        store_yaml(data)
+        store_yaml(data, STORE)
     elif mime_type == 'application/json':
-        store_json(data)
+        store_json(data, STORE)
 
 
-def parse(route):
-    global THREADS
-
+def parse(route, STORE, THREADS, TOKEN):
     response = safe_request('http://localhost:5000' + route, {'X-Access-Token': TOKEN})
     if not response:
         return
@@ -103,31 +90,29 @@ def parse(route):
 
     if 'data' in json_dict.keys():
         if 'mime_type' in json_dict.keys():
-            thrd = Thread(target=convert_and_store, args=(json_dict, json_dict['mime_type']))
+            thrd = Thread(target=convert_and_store, args=(json_dict, STORE, json_dict['mime_type']))
             THREADS.append(thrd)
             thrd.start()
         else:
-            thrd = Thread(target=convert_and_store, args=[json_dict])
+            thrd = Thread(target=convert_and_store, args=(json_dict, STORE))
             THREADS.append(thrd)
             thrd.start()
 
     for key in json_dict.keys():
         if key == 'link':
             for link_key in json_dict['link'].keys():
-                thrd = Thread(target=parse, args=[json_dict[key][link_key]])
+                thrd = Thread(target=parse, args=(json_dict[key][link_key], STORE, THREADS, TOKEN))
                 THREADS.append(thrd)
                 thrd.start()
 
 
 def grab_data():
-    global THREADS, TOKEN, STORE
-
     THREADS = []
     STORE = []
     TOKEN = get_token()
 
     if TOKEN:
-        thread = Thread(target=parse, args=['/home'])
+        thread = Thread(target=parse, args=['/home', STORE, THREADS, TOKEN])
         THREADS.append(thread)
         thread.start()
 
