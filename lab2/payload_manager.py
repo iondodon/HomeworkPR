@@ -1,0 +1,2 @@
+class PayloadManager:
+    pass

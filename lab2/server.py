@@ -10,11 +10,9 @@ class Server:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((self.ip, self.udp_port))
 
-        while True:
-            data, addr = self.sock.recvfrom(2)
-            print("Received message:", data.decode('ascii'))
-
-
+        # while True:
+        #     data, addr = self.sock.recvfrom(2)
+        #     print("Received message:", data.decode('ascii'))
 
 
 if __name__ == "main":
