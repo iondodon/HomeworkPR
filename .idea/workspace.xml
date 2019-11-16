@@ -2,10 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5caad95-a756-4775-af3e-457794503977" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/lab2/payload_manager.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lab2/aim.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lab2/datagram.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lab2/session.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/HomeworkPR.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/HomeworkPR.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dictionaries/ion.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/ion.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab2/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab2/notes.text" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab2/payload_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/payload.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab2/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/server.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -35,6 +41,7 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PythonContentEntriesConfigurable" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -66,7 +73,11 @@
       <workItem from="1573570390862" duration="9517000" />
       <workItem from="1573625865632" duration="2348000" />
       <workItem from="1573631030246" duration="961000" />
-      <workItem from="1573740773615" duration="4771000" />
+      <workItem from="1573740773615" duration="4838000" />
+      <workItem from="1573757741963" duration="3654000" />
+      <workItem from="1573798400479" duration="161000" />
+      <workItem from="1573800661174" duration="1308000" />
+      <workItem from="1573832665144" duration="19421000" />
     </task>
     <servers />
   </component>

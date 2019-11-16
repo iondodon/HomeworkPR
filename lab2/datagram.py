@@ -1,0 +1,23 @@
+import pickle
+
+
+class Datagram:
+    def __init__(self, aim, source_ip, dest_ip, secure):
+        self.aim = aim
+        self.source_ip = source_ip
+        self.dest_ip = dest_ip
+        self.__payload = None
+        self.secure = secure
+
+    def set_payload(self, payload):
+        self.__payload = payload
+
+    def get_payload(self):
+        return self.__payload
+
+    def obj_to_bin(self):
+        return pickle.dumps(self)
+
+    @staticmethod
+    def bin_to_obj(datagram_bin):
+        return pickle.loads(datagram_bin)

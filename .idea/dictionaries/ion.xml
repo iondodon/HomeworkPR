@@ -3,6 +3,7 @@
     <words>
       <w>numesc</w>
       <w>recvfrom</w>
+      <w>thrd</w>
     </words>
   </dictionary>
 </component>
