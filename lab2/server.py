@@ -18,10 +18,12 @@ class Server:
         self.sock.bind((self.ip, self.port))
 
     def send_datagram(self, dtg):
-        self.sock.sendto(Datagram.obj_to_bin(dtg), (dtg.dest_ip, 5005))
+        print("Sending: ", dtg.aim)
+        self.sock.sendto(Datagram.obj_to_bin(dtg), (dtg.dest_ip, 5006))
 
     def receive_datagram(self):
         recv_dtg_bin, address = self.sock.recvfrom(1024)
+        print("Received: ", Datagram.bin_to_obj(recv_dtg_bin).aim, address)
         return Datagram.bin_to_obj(recv_dtg_bin), address
 
     def offer_session(self, recv_dtg):

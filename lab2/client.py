@@ -1,4 +1,5 @@
 import socket
+
 from datagram import Datagram
 from aim import Aim
 
@@ -6,21 +7,28 @@ from aim import Aim
 class Client:
     def __init__(self, ip):
         self.ip = ip
+        self.port = 5006
         self.sessions = {}
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.bind((self.ip, self.port))
 
     def send_datagram(self, dtg):
+        print("Sending: ", dtg.aim)
         self.sock.sendto(dtg.obj_to_bin(), (dtg.dest_ip, 5005))
 
     def receive_datagram(self):
         recv_dtg_bin, address = self.sock.recvfrom(1024)
+        print("Received: ", Datagram.bin_to_obj(recv_dtg_bin).aim, address)
         return Datagram.bin_to_obj(recv_dtg_bin), address
 
     def get_session(self, dest_ip, secure):
         dtg = Datagram(Aim.GET_SESSION, self.ip, dest_ip, secure)
         self.send_datagram(dtg)
-        recv_dtg, address = self.receive_datagram()
-        print(recv_dtg, address)
+        for i in range(5):
+            recv_dtg, address = self.receive_datagram()
+            if recv_dtg and address:
+                return recv_dtg, address
+        return None
 
     def send_public_key(self):
         pass
@@ -43,6 +51,10 @@ class Client:
                     raise Exception("Could not send public key.")
             else:
                 raise Exception("Could not get a session after 5 attempts.")
+
+    def listen(self):
+        while True:
+            print(self.receive_datagram())
 
 
 if __name__ == "__main__":
