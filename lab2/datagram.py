@@ -2,10 +2,12 @@ import pickle
 
 
 class Datagram:
-    def __init__(self, aim, source_ip, dest_ip, secure):
+    def __init__(self, aim, source_ip, source_port, dest_ip, dest_port, secure):
         self.aim = aim
         self.source_ip = source_ip
+        self.source_port = source_port
         self.dest_ip = dest_ip
+        self.dest_port = dest_port
         self.__payload = None
         self.secure = secure
 
