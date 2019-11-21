@@ -3,7 +3,7 @@ import socket
 import string
 from concurrent.futures import ThreadPoolExecutor
 import config
-from aim import Aim
+from action import TransportAim
 from datagram import Datagram
 
 
@@ -12,6 +12,7 @@ class Server:
         self.ip = ip
         self.port = config.SERVER_PORT
         self.sessions = {}
+        self.store = {}
 
         self.executor = ThreadPoolExecutor(max_workers=config.MAX_WORKERS)
 
@@ -33,24 +34,33 @@ class Server:
         return Datagram.bin_to_obj(recv_dtg_bin), address
 
     def propose_session(self, recv_dtg):
-        dtg = Datagram(Aim.SESSION_PROPOSAL, self.ip, self.port, recv_dtg.source_ip, recv_dtg.source_port, recv_dtg.secure)
+        dtg = Datagram(TransportAim.SESSION_PROPOSAL, self.ip, self.port, recv_dtg.source_ip, recv_dtg.source_port, recv_dtg.secure)
         if recv_dtg.source_ip in self.sessions.keys():
             session = self.sessions[recv_dtg.source_ip]
         else:
             session = {
                 'session_id': len(self.sessions),
                 'server_ip': self.ip,
-                'client_ip': recv_dtg.source_ip
+                'client_ip': recv_dtg.source_ip,
+                'secure': recv_dtg.secure
             }
             if recv_dtg.secure:
                 session['AES_key'] = self.randomString()
             self.sessions[session['client_ip']] = session
         dtg.set_payload(session)
         self.send_datagram(dtg)
+        print(session)
+        print("===========================================================")
+
+    def handle_app_request(self, recv_dtg):
+        print(recv_dtg)
+        pass
 
     def process_datagram(self, addr, recv_dtg):
-        if recv_dtg.aim == Aim.GET_SESSION:
+        if recv_dtg.aim == TransportAim.GET_SESSION:
             self.propose_session(recv_dtg)
+        elif recv_dtg.aim == TransportAim.APP_REQUEST:
+            self.handle_app_request(recv_dtg)
 
     def listen(self):
         while True:

@@ -1,7 +1,7 @@
 import socket
 
 from datagram import Datagram
-from aim import Aim
+from action import TransportAim, AppVerb
 import config
 
 
@@ -23,30 +23,36 @@ class Client:
         return Datagram.bin_to_obj(recv_dtg_bin), address
 
     def get_session(self, dest_ip, secure):
-        dtg = Datagram(Aim.GET_SESSION, self.ip, self.port, dest_ip, config.SERVER_PORT, secure)
+        dtg = Datagram(TransportAim.GET_SESSION, self.ip, self.port, dest_ip, config.SERVER_PORT, secure)
         for i in range(config.GET_SESSION_ATTEMPTS):
             self.send_datagram(dtg)
             recv_dtg, address = self.receive_datagram()
             if recv_dtg and address:
                 self.sessions[recv_dtg.source_ip] = recv_dtg.get_payload()
-                return recv_dtg, address
+                return self.sessions[recv_dtg.source_ip]
         return None
 
-    def send_fragments_of_data(self, data):
+    def perform_request(self, session, app_layer_req, secure):
+        dtg = Datagram(TransportAim.APP_REQUEST, self.ip, self.port, session['server_ip'], config.SERVER_PORT, secure)
+        dtg.set_payload(app_layer_req)
+        self.send_datagram(dtg)
         pass
 
     def close_session(self):
         pass
 
-    def send_data(self, data, dest_ip, secure):
+    def send_data(self, app_layer_req, dest_ip, secure):
         if dest_ip not in self.sessions.keys():
-            if self.get_session(dest_ip, secure):
-                print(self.sessions)
-            else:
+            session = self.get_session(dest_ip, secure)
+            if not session:
                 raise Exception("Could not get a session after several attempts.")
-            
+        session = self.sessions[dest_ip]
+        print(session)
+        print("===========================================================")
+        self.perform_request(session, app_layer_req, secure)
+
 
 if __name__ == "__main__":
-    data = "Eu ma numesc Ion."
+    app_layer_req = {'verb': AppVerb.POST, 'data': "Eu ma numesc Ion."}
     client = Client(config.LOCALHOST)
-    client.send_data(data, config.LOCALHOST, True)
+    client.send_data(app_layer_req, config.LOCALHOST, True)
