@@ -2,11 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5caad95-a756-4775-af3e-457794503977" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/lab2/action.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/ion.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/ion.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab2/aim.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab2/action.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/action.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab2/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab2/datagram.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/datagram.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab2/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/server.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -128,7 +127,8 @@
       <workItem from="1573993814494" duration="20360000" />
       <workItem from="1574242928860" duration="71000" />
       <workItem from="1574243065872" duration="24000" />
-      <workItem from="1574351435479" duration="5662000" />
+      <workItem from="1574351435479" duration="5746000" />
+      <workItem from="1574404242606" duration="4302000" />
     </task>
     <servers />
   </component>

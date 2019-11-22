@@ -5,6 +5,7 @@ class TransportAim(Enum):
     GET_SESSION = 1
     SESSION_PROPOSAL = 2
     APP_REQUEST = 3
+    APP_RESPONSE = 4
 
 
 class AppVerb(Enum):
@@ -12,3 +13,5 @@ class AppVerb(Enum):
     POST = 2
     PUT = 3
     DELETE = 4
+    ERR = 5
+    OK = 6

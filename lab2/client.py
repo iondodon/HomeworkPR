@@ -32,10 +32,12 @@ class Client:
                 return self.sessions[recv_dtg.source_ip]
         return None
 
-    def perform_request(self, session, app_layer_req, secure):
-        dtg = Datagram(TransportAim.APP_REQUEST, self.ip, self.port, session['server_ip'], config.SERVER_PORT, secure)
+    def perform_request(self, session, app_layer_req):
+        dtg = Datagram(TransportAim.APP_REQUEST, self.ip, self.port, session['server_ip'], config.SERVER_PORT, session['secure'])
         dtg.set_payload(app_layer_req)
         self.send_datagram(dtg)
+        recv_dtg, address = self.receive_datagram()
+        print('\t', recv_dtg.get_payload())
         pass
 
     def close_session(self):
@@ -49,10 +51,10 @@ class Client:
         session = self.sessions[dest_ip]
         print(session)
         print("===========================================================")
-        self.perform_request(session, app_layer_req, secure)
+        self.perform_request(session, app_layer_req)
 
 
 if __name__ == "__main__":
-    app_layer_req = {'verb': AppVerb.POST, 'data': "Eu ma numesc Ion."}
+    app_layer_req = {'verb': AppVerb.POST, 'data': {'username': 'iondodon', 'age': 18}}
     client = Client(config.LOCALHOST)
     client.send_data(app_layer_req, config.LOCALHOST, True)
