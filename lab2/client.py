@@ -1,8 +1,9 @@
 import socket
 
 from datagram import Datagram
-from action import TransportAim, AppVerb
+from action import TransportAim
 import config
+import req_constructor
 
 
 class Client:
@@ -37,7 +38,7 @@ class Client:
         dtg.set_payload(app_layer_req)
         self.send_datagram(dtg)
         recv_dtg, address = self.receive_datagram()
-        print('\t', recv_dtg.get_payload())
+        print("App response:", recv_dtg.get_payload())
         pass
 
     def close_session(self):
@@ -55,6 +56,6 @@ class Client:
 
 
 if __name__ == "__main__":
-    app_layer_req = {'verb': AppVerb.POST, 'data': {'username': 'iondodon', 'age': 18}}
+    app_layer_req = req_constructor.construct_app_req()
     client = Client(config.LOCALHOST)
     client.send_data(app_layer_req, config.LOCALHOST, True)

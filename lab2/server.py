@@ -51,20 +51,57 @@ class Server:
             self.sessions[session['client_ip']] = session
         dtg.set_payload(session)
         self.send_datagram(dtg)
+        print(session)
+        print("===========================================================")
 
     def post_user(self, data, session):
         dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
         if data['username'] not in self.users.keys():
             self.users[data['username']] = data
-            app_payer_resp = {'verb': AppVerb.OK}
+            app_layer_resp = {'verb': AppVerb.OK}
         else:
-            app_payer_resp = {'verb': AppVerb.ERR, 'message': "This username already exists in the database."}
-        dtg.set_payload(app_payer_resp)
+            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This username already exists in the database."}
+        dtg.set_payload(app_layer_resp)
+        self.send_datagram(dtg)
+
+    def put_user(self, data, session):
+        dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
+        if data['username'] not in self.users.keys():
+            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
+        else:
+            self.users[data['username']] = data
+            app_layer_resp = {'verb': AppVerb.OK, 'message': "Successfully updated."}
+        dtg.set_payload(app_layer_resp)
+        self.send_datagram(dtg)
+
+    def get_user(self, data, session):
+        dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
+        if data['username'] not in self.users.keys():
+            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
+        else:
+            app_layer_resp = {'verb': AppVerb.OK, 'data': self.users[data['username']]}
+        dtg.set_payload(app_layer_resp)
+        self.send_datagram(dtg)
+
+    def delete_user(self, data, session):
+        dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
+        if data['username'] not in self.users.keys():
+            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
+        else:
+            del self.users[data['username']]
+            app_layer_resp = {'verb': AppVerb.OK, 'message': "User deleted."}
+        dtg.set_payload(app_layer_resp)
         self.send_datagram(dtg)
 
     def handle_app_request(self, payload, session):
         if payload['verb'] == AppVerb.POST:
             self.post_user(payload['data'], session)
+        elif payload['verb'] == AppVerb.PUT:
+            self.put_user(payload['data'], session)
+        elif payload['verb'] == AppVerb.GET:
+            self.get_user(payload['data'], session)
+        elif payload['verb'] == AppVerb.DELETE:
+            self.delete_user(payload['data'], session)
 
     def process_datagram(self, addr, recv_dtg):
         if recv_dtg.aim == TransportAim.GET_SESSION:
@@ -74,6 +111,7 @@ class Server:
 
     def listen(self):
         while True:
+            print("===========================================================")
             recv_dtg, addr = self.receive_datagram()
             self.executor.submit(self.process_datagram, addr, recv_dtg)
 
