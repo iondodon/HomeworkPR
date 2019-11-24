@@ -1,9 +1,10 @@
+import pickle
 import socket
-
 from datagram import Datagram
 from action import TransportAim
 import config
 import req_constructor
+from Crypto.Cipher import AES
 
 
 class Client:
@@ -11,17 +12,40 @@ class Client:
         self.ip = ip
         self.port = config.CLIENT_PORT
         self.sessions = {}
+        self.AES_ciphers = {}
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((self.ip, self.port))
 
+    def append_zs(self, data: bytes):
+        print(data)
+        while len(data) % 16 != 0:
+            data = data + '\0'.encode()
+        print(data)
+        return data
+
     def send_datagram(self, dtg):
         print("Sending: ", dtg.aim)
+        if dtg.dest_ip in self.sessions.keys() and self.sessions[dtg.dest_ip]['secure'] and dtg.aim is not TransportAim.GET_SESSION:
+            cipher = self.AES_ciphers[dtg.dest_ip]
+            payload: bytes = pickle.dumps(dtg.get_payload())
+            payload = self.append_zs(payload)
+            payload = cipher.encrypt(payload)
+            dtg.set_payload(payload)
+        print("Sending payload: ", dtg.get_payload())
         self.sock.sendto(dtg.obj_to_bin(), (dtg.dest_ip, config.SERVER_PORT))
 
     def receive_datagram(self):
         recv_dtg_bin, address = self.sock.recvfrom(config.RECV_DATA_SIZE)
         print("Received: ", Datagram.bin_to_obj(recv_dtg_bin).aim, address)
-        return Datagram.bin_to_obj(recv_dtg_bin), address
+        datagram, addr = Datagram.bin_to_obj(recv_dtg_bin), address
+        print("Received payload: ", datagram.get_payload())
+        if datagram.source_ip in self.sessions.keys() and self.sessions[datagram.source_ip]['secure']:
+            cipher = self.AES_ciphers[datagram.source_ip]
+            payload = cipher.decrypt(datagram.get_payload())
+            payload = pickle.loads(payload)
+            datagram.set_payload(payload)
+        print("Received payload: ", datagram.get_payload())
+        return datagram, addr
 
     def get_session(self, dest_ip, secure):
         dtg = Datagram(TransportAim.GET_SESSION, self.ip, self.port, dest_ip, config.SERVER_PORT, secure)
@@ -30,6 +54,9 @@ class Client:
             recv_dtg, address = self.receive_datagram()
             if recv_dtg and address:
                 self.sessions[recv_dtg.source_ip] = recv_dtg.get_payload()
+                if self.sessions[recv_dtg.source_ip]['secure']:
+                    key = self.sessions[recv_dtg.source_ip]['AES_key']
+                    self.AES_ciphers[recv_dtg.source_ip] = AES.new(key.encode(), AES.MODE_ECB)
                 return self.sessions[recv_dtg.source_ip]
         return None
 

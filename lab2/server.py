@@ -1,10 +1,13 @@
+import pickle
 import random
 import socket
 import string
 from concurrent.futures import ThreadPoolExecutor
+import json
 import config
 from action import TransportAim, AppVerb
 from datagram import Datagram
+from Crypto.Cipher import AES
 
 
 class Server:
@@ -12,6 +15,7 @@ class Server:
         self.ip = ip
         self.port = config.SERVER_PORT
         self.sessions = {}
+        self.AES_ciphers = {}
         self.users = {}
 
         self.executor = ThreadPoolExecutor(max_workers=config.MAX_WORKERS)
@@ -24,14 +28,34 @@ class Server:
         letters = string.ascii_lowercase
         return ''.join(random.choice(letters) for i in range(stringLength))
 
+    def append_zs(self, data: bytes):
+        while len(data) % 16 != 0:
+            data = data + '\0'.encode()
+        return data
+
     def send_datagram(self, dtg):
         print("Sending: ", dtg.aim)
+        if dtg.dest_ip in self.sessions.keys() and self.sessions[dtg.dest_ip]['secure'] and dtg.aim is not TransportAim.SESSION_PROPOSAL:
+            cipher = self.AES_ciphers[dtg.dest_ip]
+            payload: bytes = pickle.dumps(dtg.get_payload())
+            payload = self.append_zs(payload)
+            payload = cipher.encrypt(payload)
+            dtg.set_payload(payload)
+        print("Sending payload: ", dtg.get_payload())
         self.sock.sendto(Datagram.obj_to_bin(dtg), (dtg.dest_ip, dtg.dest_port))
 
     def receive_datagram(self):
         recv_dtg_bin, address = self.sock.recvfrom(config.RECV_DATA_SIZE)
         print("Received: ", Datagram.bin_to_obj(recv_dtg_bin).aim, address)
-        return Datagram.bin_to_obj(recv_dtg_bin), address
+        datagram, addr = Datagram.bin_to_obj(recv_dtg_bin), address
+        print("Received payload: ", datagram.get_payload())
+        if datagram.source_ip in self.sessions.keys() and self.sessions[datagram.source_ip]['secure'] and datagram.aim is not TransportAim.GET_SESSION:
+            cipher = self.AES_ciphers[datagram.source_ip]
+            payload = cipher.decrypt(datagram.get_payload())
+            payload = pickle.loads(payload)
+            datagram.set_payload(payload)
+        print("Received payload: ", datagram.get_payload(), type(datagram.get_payload()))
+        return datagram, addr
 
     def propose_session(self, recv_dtg):
         dtg = Datagram(TransportAim.SESSION_PROPOSAL, self.ip, self.port, recv_dtg.source_ip, recv_dtg.source_port, recv_dtg.secure)
@@ -44,14 +68,17 @@ class Server:
                 'server_port': self.port,
                 'client_ip': recv_dtg.source_ip,
                 'client_port': recv_dtg.source_port,
-                'secure': recv_dtg.secure
+                'secure': recv_dtg.secure,
             }
             if recv_dtg.secure:
                 session['AES_key'] = self.randomString()
+                self.AES_ciphers[recv_dtg.source_ip] = {}
+                cipher = AES.new(session['AES_key'].encode(), AES.MODE_ECB)
+                self.AES_ciphers[recv_dtg.source_ip] = cipher
             self.sessions[session['client_ip']] = session
+            print(session)
         dtg.set_payload(session)
         self.send_datagram(dtg)
-        print(session)
         print("===========================================================")
 
     def post_user(self, data, session):
