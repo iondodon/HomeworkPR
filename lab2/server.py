@@ -1,3 +1,4 @@
+import pickle
 import socket
 import utils
 from concurrent.futures import ThreadPoolExecutor
@@ -20,6 +21,27 @@ class Server:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((self.ip, self.port))
 
+    def send_datagram(self, dtg, encryption_enabled):
+        print("Sending: ", dtg.aim)
+        dest_ip = dtg.dest_ip
+        dest_port = dtg.dest_port
+        dtg: bytes = pickle.dumps(dtg)
+        if encryption_enabled:
+            cipher = self.AES_ciphers[dest_ip]
+            dtg = utils.append_zs(dtg)
+            dtg = cipher.encrypt(dtg)
+        print("Sending datagram: ", dtg)
+        self.sock.sendto(dtg, (dest_ip, dest_port))
+
+    def receive_datagram(self):
+        recv_dtg, address = self.sock.recvfrom(config.RECV_DATA_SIZE)
+        if address[0] in self.sessions.keys() and self.sessions[address[0]]['secure']:
+            cipher = self.AES_ciphers[address[0]]
+            recv_dtg = cipher.decrypt(recv_dtg)
+        recv_dtg = pickle.loads(recv_dtg)
+        print("Received datagram: ", recv_dtg)
+        return recv_dtg, address
+
     def propose_session(self, recv_dtg):
         dtg = Datagram(TransportAim.SESSION_PROPOSAL, self.ip, self.port, recv_dtg.source_ip, recv_dtg.source_port, recv_dtg.secure)
         if recv_dtg.source_ip in self.sessions.keys():
@@ -39,9 +61,8 @@ class Server:
                 cipher = AES.new(session['AES_key'].encode(), AES.MODE_ECB)
                 self.AES_ciphers[recv_dtg.source_ip] = cipher
             self.sessions[session['client_ip']] = session
-            print(session)
         dtg.set_payload(session)
-        utils.send_datagram(dtg, self.sessions, self.AES_ciphers, self.sock)
+        self.send_datagram(dtg, False)
         print("===========================================================")
 
     def post_user(self, data, session):
@@ -52,7 +73,7 @@ class Server:
         else:
             app_layer_resp = {'verb': AppVerb.ERR, 'message': "This username already exists in the database."}
         dtg.set_payload(app_layer_resp)
-        utils.send_datagram(dtg, self.sessions, self.AES_ciphers, self.sock)
+        self.send_datagram(dtg, True & dtg.secure)
 
     def put_user(self, data, session):
         dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
@@ -62,7 +83,7 @@ class Server:
             self.users[data['username']] = data
             app_layer_resp = {'verb': AppVerb.OK, 'message': "Successfully updated."}
         dtg.set_payload(app_layer_resp)
-        utils.send_datagram(dtg, self.sessions, self.AES_ciphers, self.sock)
+        self.send_datagram(dtg, True & dtg.secure)
 
     def get_user(self, data, session):
         dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
@@ -71,7 +92,7 @@ class Server:
         else:
             app_layer_resp = {'verb': AppVerb.OK, 'data': self.users[data['username']]}
         dtg.set_payload(app_layer_resp)
-        utils.send_datagram(dtg, self.sessions, self.AES_ciphers, self.sock)
+        self.send_datagram(dtg, True & dtg.secure)
 
     def delete_user(self, data, session):
         dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
@@ -81,7 +102,7 @@ class Server:
             del self.users[data['username']]
             app_layer_resp = {'verb': AppVerb.OK, 'message': "User deleted."}
         dtg.set_payload(app_layer_resp)
-        utils.send_datagram(dtg, self.sessions, self.AES_ciphers, self.sock)
+        self.send_datagram(dtg, True & dtg.secure)
 
     def handle_app_request(self, payload, session):
         if payload['verb'] == AppVerb.POST:
@@ -102,7 +123,7 @@ class Server:
     def listen(self):
         while True:
             print("===========================================================")
-            recv_dtg, addr = utils.receive_datagram(self.sessions, self.AES_ciphers, self.sock)
+            recv_dtg, addr = self.receive_datagram()
             self.executor.submit(self.process_datagram, addr, recv_dtg)
 
 
