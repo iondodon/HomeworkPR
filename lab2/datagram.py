@@ -17,9 +17,9 @@ class Datagram:
     def get_payload(self):
         return self.__payload
 
-    def obj_to_bin(self):
+    def obj_to_bytes(self):
         return pickle.dumps(self)
 
     @staticmethod
-    def bin_to_obj(datagram_bin):
+    def bytes_to_obj(datagram_bin):
         return pickle.loads(datagram_bin)
