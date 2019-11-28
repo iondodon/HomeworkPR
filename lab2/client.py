@@ -94,9 +94,16 @@ class Client:
 
 if __name__ == "__main__":
     client = Client(config.LOCALHOST)
+    print("===========================================================")
+    choice = input("secure 0/1: ")
+    if choice == '0':
+        secure = False
+    else:
+        secure = True
     while True:
         app_layer_req = req_constructor.construct_app_req()
         if app_layer_req['verb'] == AppVerb.CLOSE:
             client.close_session(app_layer_req)
+            break
         else:
-            client.send_data(app_layer_req, config.LOCALHOST, True)
+            client.send_data(app_layer_req, config.LOCALHOST, secure)
