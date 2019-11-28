@@ -1,3 +1,8 @@
+import pickle
+
+from Crypto.Hash import SHA256
+
+
 class Datagram:
     def __init__(self, aim, source_ip, source_port, dest_ip, dest_port, secure):
         self.aim = aim
@@ -6,10 +11,16 @@ class Datagram:
         self.dest_ip = dest_ip
         self.dest_port = dest_port
         self.__payload = None
+        self.__cksm = None
         self.secure = secure
 
     def set_payload(self, payload):
         self.__payload = payload
+        hash_obj = SHA256.new(pickle.dumps(self.__payload))
+        self.__cksm = hash_obj.hexdigest()
 
     def get_payload(self):
         return self.__payload
+
+    def get_cksm(self):
+        return self.__cksm

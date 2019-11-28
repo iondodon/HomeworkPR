@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5caad95-a756-4775-af3e-457794503977" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/ion.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/ion.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab2/action.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/action.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab2/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab2/datagram.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/datagram.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab2/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/server.py" afterDir="false" />
@@ -130,6 +132,8 @@
       <workItem from="1574351435479" duration="5746000" />
       <workItem from="1574404242606" duration="35266000" />
       <workItem from="1574664852216" duration="2795000" />
+      <workItem from="1574890041698" duration="3398000" />
+      <workItem from="1574927544350" duration="4763000" />
     </task>
     <servers />
   </component>

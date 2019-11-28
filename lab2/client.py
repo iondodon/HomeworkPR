@@ -22,12 +22,20 @@ class Client:
         dest_ip = dtg.dest_ip
         dest_port = dtg.dest_port
         dtg: bytes = pickle.dumps(dtg)
+        cipher = None
         if encryption_enabled:
             cipher = self.AES_ciphers[dest_ip]
             dtg = utils.append_zs(dtg)
             dtg = cipher.encrypt(dtg)
-        print("Sending datagram: ", dtg)
-        self.sock.sendto(dtg, (dest_ip, dest_port))
+        while True:
+            self.sock.sendto(dtg, (dest_ip, dest_port))
+            response_dtg, address = self.sock.recvfrom(config.RECV_DATA_SIZE)
+            if encryption_enabled:
+                response_dtg = cipher.decrypt(response_dtg)
+            response_dtg = pickle.loads(response_dtg)
+            print("Recv ack: ", response_dtg.aim)
+            if response_dtg.aim == TransportAim.OK:
+                break
 
     def receive_datagram(self, encryption_enabled):
         recv_dtg, address = self.sock.recvfrom(config.RECV_DATA_SIZE)
@@ -35,7 +43,6 @@ class Client:
             cipher = self.AES_ciphers[address[0]]
             recv_dtg = cipher.decrypt(recv_dtg)
         recv_dtg = pickle.loads(recv_dtg)
-        print("Received datagram: ", recv_dtg)
         return recv_dtg, address
 
     def get_session(self, dest_ip, secure):
@@ -67,7 +74,6 @@ class Client:
             if not session:
                 raise Exception("Could not get a session after several attempts.")
         session = self.sessions[dest_ip]
-        print(session)
         print("===========================================================")
         self.perform_request(session, app_layer_req)
 

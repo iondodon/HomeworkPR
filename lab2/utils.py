@@ -1,6 +1,8 @@
+import pickle
 import random
 import string
 import config
+from Crypto.Hash import SHA256
 
 
 def randomString(stringLength=config.AES_KEY_LENGTH):
@@ -13,3 +15,16 @@ def append_zs(data: bytes):
     while len(data) % 16 != 0:
         data = data + '\0'.encode()
     return data
+
+
+def valid_cksm(payload, recv_cksm):
+    if payload is None:
+        return True
+
+    hash_obj = SHA256.new(pickle.dumps(payload))
+    print("Recv cksm: ", recv_cksm)
+    if hash_obj.hexdigest() != recv_cksm:
+        return False
+    print("Calc cksm: ", hash_obj.hexdigest())
+
+    return True

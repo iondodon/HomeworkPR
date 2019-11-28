@@ -6,6 +6,8 @@ class TransportAim(Enum):
     SESSION_PROPOSAL = 2
     APP_REQUEST = 3
     APP_RESPONSE = 4
+    CORRUPTED = 5
+    OK = 6
 
 
 class AppVerb(Enum):

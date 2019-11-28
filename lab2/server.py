@@ -30,16 +30,36 @@ class Server:
             cipher = self.AES_ciphers[dest_ip]
             dtg = utils.append_zs(dtg)
             dtg = cipher.encrypt(dtg)
-        print("Sending datagram: ", dtg)
         self.sock.sendto(dtg, (dest_ip, dest_port))
 
     def receive_datagram(self):
         recv_dtg, address = self.sock.recvfrom(config.RECV_DATA_SIZE)
+        cipher = None
+        print(self.sessions)
         if address[0] in self.sessions.keys() and self.sessions[address[0]]['secure']:
             cipher = self.AES_ciphers[address[0]]
             recv_dtg = cipher.decrypt(recv_dtg)
         recv_dtg = pickle.loads(recv_dtg)
-        print("Received datagram: ", recv_dtg)
+        print("Received: ", recv_dtg.aim)
+
+        if not utils.valid_cksm(recv_dtg.get_payload(), recv_dtg.get_cksm()):
+            response_dtg = Datagram(TransportAim.CORRUPTED, self.ip, self.port, recv_dtg.source_ip, recv_dtg.source_port, recv_dtg.secure)
+            print("Sending ack: ", response_dtg.aim)
+            response_dtg = pickle.dumps(response_dtg)
+            if address[0] in self.sessions.keys() and self.sessions[address[0]]['secure']:
+                response_dtg = utils.append_zs(response_dtg)
+                response_dtg = cipher.encrypt(response_dtg)
+            self.sock.sendto(response_dtg, address)
+            return response_dtg, address
+        else:
+            response_dtg = Datagram(TransportAim.OK, self.ip, self.port, recv_dtg.source_ip, recv_dtg.source_port, recv_dtg.secure)
+            print("Sending ack: ", response_dtg.aim)
+            response_dtg = pickle.dumps(response_dtg)
+            if address[0] in self.sessions.keys() and self.sessions[address[0]]['secure']:
+                response_dtg = utils.append_zs(response_dtg)
+                response_dtg = cipher.encrypt(response_dtg)
+            self.sock.sendto(response_dtg, address)
+
         return recv_dtg, address
 
     def propose_session(self, recv_dtg):
@@ -57,7 +77,7 @@ class Server:
             }
             if recv_dtg.secure:
                 session['AES_key'] = utils.randomString()
-                self.AES_ciphers[recv_dtg.source_ip] = {}
+                self.AES_ciphers[recv_dtg.source_ip] = None
                 cipher = AES.new(session['AES_key'].encode(), AES.MODE_ECB)
                 self.AES_ciphers[recv_dtg.source_ip] = cipher
             self.sessions[session['client_ip']] = session
@@ -119,6 +139,8 @@ class Server:
             self.propose_session(recv_dtg)
         elif recv_dtg.aim == TransportAim.APP_REQUEST:
             self.handle_app_request(recv_dtg.get_payload(), self.sessions[recv_dtg.source_ip])
+        elif recv_dtg.aim == TransportAim.CORRUPTED:
+            print("Message corrupted.")
 
     def listen(self):
         while True:
