@@ -8,6 +8,8 @@ def construct_app_req():
     2: PUT
     3: GET
     4: DELETE
+    
+    0: CLOSE SESSION 
 
     Please enter your choice: """)
 
@@ -30,5 +32,9 @@ def construct_app_req():
         app_layer_req['verb'] = AppVerb.DELETE
         app_layer_req['data'] = {}
         app_layer_req['data']['username'] = input("username: ")
+    elif choice == '0':
+        app_layer_req['verb'] = AppVerb.CLOSE
+        app_layer_req['data'] = {}
+        app_layer_req['data']['server_ip'] = input("server ip: ")
 
     return app_layer_req

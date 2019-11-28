@@ -17,3 +17,4 @@ class AppVerb(Enum):
     DELETE = 4
     ERR = 5
     OK = 6
+    CLOSE = 7

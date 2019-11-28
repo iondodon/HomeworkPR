@@ -1,7 +1,7 @@
 import pickle
 import socket
 from datagram import Datagram
-from action import TransportAim
+from action import TransportAim, AppVerb
 import config
 import req_constructor
 from Crypto.Cipher import AES
@@ -65,8 +65,22 @@ class Client:
         recv_dtg, address = self.receive_datagram(True & dtg.secure)
         print("App response:", recv_dtg.get_payload())
 
-    def close_session(self):
-        pass
+    def close_session(self, app_layer_req):
+        server_ip = app_layer_req['data']['server_ip']
+        dtg = Datagram(
+            TransportAim.APP_REQUEST,
+            self.ip, self.port,
+            self.sessions[server_ip]['server_ip'],
+            self.sessions[server_ip]['server_port'],
+            self.sessions[server_ip]['secure']
+        )
+        dtg.set_payload(app_layer_req)
+        self.send_datagram(dtg, self.sessions[server_ip]['secure'])
+        dtg, address = self.receive_datagram(self.sessions[server_ip]['secure'])
+        print(dtg.aim)
+        print(self.sessions)
+        del self.sessions[server_ip]
+        print(self.sessions)
 
     def send_data(self, app_layer_req, dest_ip, secure):
         if dest_ip not in self.sessions.keys():
@@ -82,4 +96,7 @@ if __name__ == "__main__":
     client = Client(config.LOCALHOST)
     while True:
         app_layer_req = req_constructor.construct_app_req()
-        client.send_data(app_layer_req, config.LOCALHOST, True)
+        if app_layer_req['verb'] == AppVerb.CLOSE:
+            client.close_session(app_layer_req)
+        else:
+            client.send_data(app_layer_req, config.LOCALHOST, True)

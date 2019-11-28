@@ -133,6 +133,8 @@ class Server:
             self.get_user(payload['data'], session)
         elif payload['verb'] == AppVerb.DELETE:
             self.delete_user(payload['data'], session)
+        elif payload['verb'] == AppVerb.CLOSE:
+            self.close_session(session)
 
     def process_datagram(self, addr, recv_dtg):
         if recv_dtg.aim == TransportAim.GET_SESSION:
@@ -141,6 +143,15 @@ class Server:
             self.handle_app_request(recv_dtg.get_payload(), self.sessions[recv_dtg.source_ip])
         elif recv_dtg.aim == TransportAim.CORRUPTED:
             print("Message corrupted.")
+
+    def close_session(self, session):
+        print(self.sessions)
+        dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
+        app_layer_resp = {'verb': AppVerb.ERR, 'message': "Session closed."}
+        dtg.set_payload(app_layer_resp)
+        self.send_datagram(dtg, session['secure'])
+        del self.sessions[session['client_ip']]
+        print(self.sessions)
 
     def listen(self):
         while True:
