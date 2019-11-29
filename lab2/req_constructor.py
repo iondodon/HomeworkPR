@@ -35,6 +35,6 @@ def construct_app_req():
     elif choice == '0':
         app_layer_req['verb'] = AppVerb.CLOSE
         app_layer_req['data'] = {}
-        app_layer_req['data']['server_ip'] = input("server ip: ")
+        app_layer_req['data']['server_ip'] = None
 
     return app_layer_req

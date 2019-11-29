@@ -2,7 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5caad95-a756-4775-af3e-457794503977" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/lab2/lab2.zip" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab2/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab2/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab2/req_constructor.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/req_constructor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab2/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/utils.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -21,7 +26,11 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1TFyC9ibEHsgCTivEBW5KjybvYd" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -128,6 +137,7 @@
       <workItem from="1574664852216" duration="2795000" />
       <workItem from="1574890041698" duration="3398000" />
       <workItem from="1574927544350" duration="4763000" />
+      <workItem from="1575055155425" duration="885000" />
     </task>
     <servers />
   </component>
@@ -146,6 +156,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/HomeworkPR$server.coverage" NAME="server Coverage Results" MODIFIED="1574014485480" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/lab2" />

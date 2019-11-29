@@ -103,6 +103,7 @@ if __name__ == "__main__":
     while True:
         app_layer_req = req_constructor.construct_app_req()
         if app_layer_req['verb'] == AppVerb.CLOSE:
+            app_layer_req['data']['server_ip'] = client.ip
             client.close_session(app_layer_req)
             break
         else:
