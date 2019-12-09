@@ -17,7 +17,7 @@ class App:
         else:
             app_layer_resp = {'verb': AppVerb.ERR, 'message': "This username already exists in the database."}
         dtg.set_payload(app_layer_resp)
-        self.send_datagram(dtg, True & dtg.secure)
+        self.send_datagram(dtg)
 
     def put_user(self, data, session):
         dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
@@ -27,7 +27,7 @@ class App:
             self.users[data['username']] = data
             app_layer_resp = {'verb': AppVerb.OK, 'message': "Successfully updated."}
         dtg.set_payload(app_layer_resp)
-        self.send_datagram(dtg, True & dtg.secure)
+        self.send_datagram(dtg)
 
     def get_user(self, data, session):
         dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
@@ -36,7 +36,7 @@ class App:
         else:
             app_layer_resp = {'verb': AppVerb.OK, 'data': self.users[data['username']]}
         dtg.set_payload(app_layer_resp)
-        self.send_datagram(dtg, True & dtg.secure)
+        self.send_datagram(dtg)
 
     def delete_user(self, data, session):
         dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
@@ -46,7 +46,7 @@ class App:
             del self.users[data['username']]
             app_layer_resp = {'verb': AppVerb.OK, 'message': "User deleted."}
         dtg.set_payload(app_layer_resp)
-        self.send_datagram(dtg, True & dtg.secure)
+        self.send_datagram(dtg)
 
     def construct_app_req(self):
         choice = input("""

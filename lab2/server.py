@@ -24,12 +24,12 @@ class Server:
 
         self.app = App(self.ip, self.port, self.users, self.send_datagram)
 
-    def send_datagram(self, dtg, encryption_enabled):
+    def send_datagram(self, dtg):
         print("Sending: ", dtg.aim)
         dest_ip = dtg.dest_ip
         dest_port = dtg.dest_port
         dtg: bytes = pickle.dumps(dtg)
-        if encryption_enabled:
+        if dest_ip in self.AES_ciphers.keys():
             cipher = self.AES_ciphers[dest_ip]
             dtg = utils.append_zs(dtg)
             dtg = cipher.encrypt(dtg)
@@ -38,55 +38,32 @@ class Server:
     def receive_datagram(self):
         recv_dtg, address = self.sock.recvfrom(config.RECV_DATA_SIZE)
         print(recv_dtg)
-        cipher = None
         print(self.sessions)
-        if address[0] in self.sessions.keys() and self.sessions[address[0]]['secure']:
+        if address[0] in self.AES_ciphers.keys():
             cipher = self.AES_ciphers[address[0]]
             recv_dtg = cipher.decrypt(recv_dtg)
         recv_dtg = pickle.loads(recv_dtg)
         print("Received: ", recv_dtg.aim)
-
-        if not utils.valid_cksm(recv_dtg.get_payload(), recv_dtg.get_cksm()):
-            response_dtg = Datagram(TransportAim.CORRUPTED, self.ip, self.port, recv_dtg.source_ip, recv_dtg.source_port, recv_dtg.secure)
-            print("Sending ack: ", response_dtg.aim)
-            response_dtg = pickle.dumps(response_dtg)
-            if address[0] in self.sessions.keys() and self.sessions[address[0]]['secure']:
-                response_dtg = utils.append_zs(response_dtg)
-                response_dtg = cipher.encrypt(response_dtg)
-            self.sock.sendto(response_dtg, address)
-            return response_dtg, address
-        else:
-            response_dtg = Datagram(TransportAim.OK, self.ip, self.port, recv_dtg.source_ip, recv_dtg.source_port, recv_dtg.secure)
-            print("Sending ack: ", response_dtg.aim)
-            response_dtg = pickle.dumps(response_dtg)
-            if address[0] in self.sessions.keys() and self.sessions[address[0]]['secure']:
-                response_dtg = utils.append_zs(response_dtg)
-                response_dtg = cipher.encrypt(response_dtg)
-            self.sock.sendto(response_dtg, address)
-
         return recv_dtg, address
 
     def propose_session(self, recv_dtg):
         dtg = Datagram(TransportAim.SESSION_PROPOSAL, self.ip, self.port, recv_dtg.source_ip, recv_dtg.source_port, recv_dtg.secure)
         if recv_dtg.source_ip in self.sessions.keys():
             session = self.sessions[recv_dtg.source_ip]
+            dtg.set_payload(session)
+            self.send_datagram(dtg)
         else:
-            session = {
-                'session_id': len(self.sessions),
-                'server_ip': self.ip,
-                'server_port': self.port,
-                'client_ip': recv_dtg.source_ip,
-                'client_port': recv_dtg.source_port,
-                'secure': recv_dtg.secure,
-            }
-            if recv_dtg.secure:
-                session['AES_key'] = utils.random_string()
-                self.AES_ciphers[recv_dtg.source_ip] = None
-                cipher = AES.new(session['AES_key'].encode(), AES.MODE_ECB)
-                self.AES_ciphers[recv_dtg.source_ip] = cipher
+            session = {'session_id': len(self.sessions), 'server_ip': self.ip, 'server_port': self.port,
+                       'client_ip': recv_dtg.source_ip, 'client_port': recv_dtg.source_port, 'secure': recv_dtg.secure,
+                       'AES_key': utils.random_string()}
             self.sessions[session['client_ip']] = session
-        dtg.set_payload(session)
-        self.send_datagram(dtg, False)
+
+            dtg.set_payload(session)
+            self.send_datagram(dtg)
+
+            self.AES_ciphers[recv_dtg.source_ip] = None
+            cipher = AES.new(session['AES_key'].encode(), AES.MODE_ECB)
+            self.AES_ciphers[recv_dtg.source_ip] = cipher
         print("===========================================================")
 
     def handle_app_request(self, payload, session):
@@ -114,7 +91,7 @@ class Server:
         dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
         app_layer_resp = {'verb': AppVerb.ERR, 'message': "Session closed."}
         dtg.set_payload(app_layer_resp)
-        self.send_datagram(dtg, session['secure'])
+        self.send_datagram(dtg)
         del self.sessions[session['client_ip']]
         print(self.sessions)
 
