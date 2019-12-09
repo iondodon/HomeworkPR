@@ -1,3 +1,4 @@
+import config
 from action import TransportAim, AppVerb
 from datagram import Datagram
 
@@ -5,6 +6,29 @@ from datagram import Datagram
 class Application:
     def __init__(self, gainer):
         self.gainer = gainer
+
+    def client_perform_request(self, session, app_layer_req):
+        dtg = Datagram(
+            TransportAim.APP_REQUEST,
+            self.gainer.ip,
+            self.gainer.port,
+            session['server_ip'],
+            config.SERVER_PORT,
+            session['secure']
+        )
+        dtg.set_payload(app_layer_req)
+        self.gainer.transport.send_datagram(dtg)
+        recv_dtg, address = self.gainer.transport.receive_datagram()
+        print("App response:", recv_dtg.get_payload())
+
+    def client_send_data(self, app_layer_req, dest_ip):
+        if dest_ip not in self.gainer.sessions.keys():
+            session = self.gainer.transport.get_session(dest_ip)
+            if not session:
+                raise Exception("Could not get a session after several attempts.")
+        session = self.gainer.sessions[dest_ip]
+        print("===========================================================")
+        self.client_perform_request(session, app_layer_req)
 
     def server_close_session(self, session):
         print(self.gainer.sessions)

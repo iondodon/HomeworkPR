@@ -18,22 +18,6 @@ class Client:
         self.transport = Transport(self)
         self.application = Application(self)
 
-    def perform_request(self, session, app_layer_req):
-        dtg = Datagram(TransportAim.APP_REQUEST, self.ip, self.port, session['server_ip'], config.SERVER_PORT, session['secure'])
-        dtg.set_payload(app_layer_req)
-        self.transport.send_datagram(dtg)
-        recv_dtg, address = self.transport.receive_datagram()
-        print("App response:", recv_dtg.get_payload())
-
-    def send_data(self, app_layer_req, dest_ip):
-        if dest_ip not in self.sessions.keys():
-            session = self.transport.get_session(dest_ip)
-            if not session:
-                raise Exception("Could not get a session after several attempts.")
-        session = self.sessions[dest_ip]
-        print("===========================================================")
-        self.perform_request(session, app_layer_req)
-
     def run(self):
         print("===========================================================")
         while True:
@@ -43,7 +27,7 @@ class Client:
                 self.application.client_close_session(app_layer_req)
                 break
             else:
-                self.send_data(app_layer_req, config.LOCALHOST)
+                self.application.client_send_data(app_layer_req, config.LOCALHOST)
 
 
 if __name__ == "__main__":

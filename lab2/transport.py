@@ -1,7 +1,5 @@
 import pickle
-
 from Crypto.Cipher import AES
-
 import config
 import utils
 from action import TransportAim
