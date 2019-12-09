@@ -46,7 +46,8 @@ class Server:
         while True:
             print("===========================================================")
             recv_dtg, addr = self.transport.receive_datagram()
-            self.executor.submit(self.process_datagram, addr, recv_dtg)
+            # self.executor.submit(self.process_datagram, addr, recv_dtg)
+            self.process_datagram(addr, recv_dtg)
 
 
 if __name__ == "__main__":
