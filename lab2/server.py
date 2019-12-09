@@ -3,7 +3,7 @@ import utils
 from concurrent.futures import ThreadPoolExecutor
 import config
 from action import TransportAim, AppVerb
-from app import App
+from application import Application
 from datagram import Datagram
 from Crypto.Cipher import AES
 from transport import Transport
@@ -23,7 +23,7 @@ class Server:
         self.sock.bind((self.ip, self.port))
 
         self.transport = Transport(self)
-        self.app = App(self)
+        self.application = Application(self)
 
     def propose_session(self, recv_dtg):
         dtg = Datagram(TransportAim.SESSION_PROPOSAL, self.ip, self.port, recv_dtg.source_ip, recv_dtg.source_port, recv_dtg.secure)
@@ -47,15 +47,15 @@ class Server:
 
     def handle_app_request(self, payload, session):
         if payload['verb'] == AppVerb.POST:
-            self.app.post_user(payload['data'], session)
+            self.application.post_user(payload['data'], session)
         elif payload['verb'] == AppVerb.PUT:
-            self.app.put_user(payload['data'], session)
+            self.application.put_user(payload['data'], session)
         elif payload['verb'] == AppVerb.GET:
-            self.app.get_user(payload['data'], session)
+            self.application.get_user(payload['data'], session)
         elif payload['verb'] == AppVerb.DELETE:
-            self.app.delete_user(payload['data'], session)
+            self.application.delete_user(payload['data'], session)
         elif payload['verb'] == AppVerb.CLOSE:
-            self.close_session(session)
+            self.application.server_close_session(session)
 
     def process_datagram(self, addr, recv_dtg):
         if recv_dtg.aim == TransportAim.GET_SESSION:
@@ -64,15 +64,6 @@ class Server:
             self.handle_app_request(recv_dtg.get_payload(), self.sessions[recv_dtg.source_ip])
         elif recv_dtg.aim == TransportAim.CORRUPTED:
             print("Message corrupted.")
-
-    def close_session(self, session):
-        print(self.sessions)
-        dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
-        app_layer_resp = {'verb': AppVerb.ERR, 'message': "Session closed."}
-        dtg.set_payload(app_layer_resp)
-        self.transport.send_datagram(dtg)
-        del self.sessions[session['client_ip']]
-        print(self.sessions)
 
     def listen(self):
         while True:

@@ -2,9 +2,42 @@ from action import TransportAim, AppVerb
 from datagram import Datagram
 
 
-class App:
+class Application:
     def __init__(self, gainer):
         self.gainer = gainer
+
+    def server_close_session(self, session):
+        print(self.gainer.sessions)
+        dtg = Datagram(
+            TransportAim.APP_RESPONSE,
+            self.gainer.ip,
+            self.gainer.port,
+            session['client_ip'],
+            session['client_port'],
+            session['secure']
+        )
+        app_layer_resp = {'verb': AppVerb.ERR, 'message': "Session closed."}
+        dtg.set_payload(app_layer_resp)
+        self.gainer.transport.send_datagram(dtg)
+        del self.gainer.sessions[session['client_ip']]
+        print(self.gainer.sessions)
+
+    def client_close_session(self, app_layer_req):
+        server_ip = app_layer_req['data']['server_ip']
+        dtg = Datagram(
+            TransportAim.APP_REQUEST,
+            self.gainer.ip, self.gainer.port,
+            self.gainer.sessions[server_ip]['server_ip'],
+            self.gainer.sessions[server_ip]['server_port'],
+            self.gainer.sessions[server_ip]['secure']
+        )
+        dtg.set_payload(app_layer_req)
+        self.gainer.transport.send_datagram(dtg)
+        dtg, address = self.gainer.transport.receive_datagram()
+        print(dtg.aim)
+        print(self.gainer.sessions)
+        del self.gainer.sessions[server_ip]
+        print(self.gainer.sessions)
 
     def post_user(self, data, session):
         dtg = Datagram(

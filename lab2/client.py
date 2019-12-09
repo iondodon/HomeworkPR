@@ -1,5 +1,5 @@
 import socket
-from app import App
+from application import Application
 from datagram import Datagram
 from action import TransportAim, AppVerb
 import config
@@ -17,10 +17,10 @@ class Client:
         self.sock.bind((self.ip, self.port))
 
         self.transport = Transport(self)
-        self.app = App(self)
+        self.application = Application(self)
 
-    def get_session(self, dest_ip, secure):
-        dtg = Datagram(TransportAim.GET_SESSION, self.ip, self.port, dest_ip, config.SERVER_PORT, secure)
+    def get_session(self, dest_ip):
+        dtg = Datagram(TransportAim.GET_SESSION, self.ip, self.port, dest_ip, config.SERVER_PORT, True)
         for i in range(config.GET_SESSION_ATTEMPTS):
             self.transport.send_datagram(dtg)
             recv_dtg, address = self.transport.receive_datagram()
@@ -39,26 +39,9 @@ class Client:
         recv_dtg, address = self.transport.receive_datagram()
         print("App response:", recv_dtg.get_payload())
 
-    def close_session(self, app_layer_req):
-        server_ip = app_layer_req['data']['server_ip']
-        dtg = Datagram(
-            TransportAim.APP_REQUEST,
-            self.ip, self.port,
-            self.sessions[server_ip]['server_ip'],
-            self.sessions[server_ip]['server_port'],
-            self.sessions[server_ip]['secure']
-        )
-        dtg.set_payload(app_layer_req)
-        self.transport.send_datagram(dtg)
-        dtg, address = self.transport.receive_datagram()
-        print(dtg.aim)
-        print(self.sessions)
-        del self.sessions[server_ip]
-        print(self.sessions)
-
-    def send_data(self, app_layer_req, dest_ip, secure):
+    def send_data(self, app_layer_req, dest_ip):
         if dest_ip not in self.sessions.keys():
-            session = self.get_session(dest_ip, secure)
+            session = self.get_session(dest_ip)
             if not session:
                 raise Exception("Could not get a session after several attempts.")
         session = self.sessions[dest_ip]
@@ -67,19 +50,14 @@ class Client:
 
     def run(self):
         print("===========================================================")
-        choice = input("secure 0/1: ")
-        if choice == '0':
-            secure = False
-        else:
-            secure = True
         while True:
-            app_layer_req = self.app.construct_app_req()
+            app_layer_req = self.application.construct_app_req()
             if app_layer_req['verb'] == AppVerb.CLOSE:
-                app_layer_req['data']['server_ip'] = client.ip
-                client.close_session(app_layer_req)
+                app_layer_req['data']['server_ip'] = self.ip
+                self.application.client_close_session(app_layer_req)
                 break
             else:
-                client.send_data(app_layer_req, config.LOCALHOST, secure)
+                self.send_data(app_layer_req, config.LOCALHOST)
 
 
 if __name__ == "__main__":
