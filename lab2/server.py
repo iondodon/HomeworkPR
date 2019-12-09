@@ -4,6 +4,7 @@ import utils
 from concurrent.futures import ThreadPoolExecutor
 import config
 from action import TransportAim, AppVerb
+from app import App
 from datagram import Datagram
 from Crypto.Cipher import AES
 
@@ -21,6 +22,8 @@ class Server:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((self.ip, self.port))
 
+        self.app = App(self.ip, self.port, self.users, self.send_datagram)
+
     def send_datagram(self, dtg, encryption_enabled):
         print("Sending: ", dtg.aim)
         dest_ip = dtg.dest_ip
@@ -34,6 +37,7 @@ class Server:
 
     def receive_datagram(self):
         recv_dtg, address = self.sock.recvfrom(config.RECV_DATA_SIZE)
+        print(recv_dtg)
         cipher = None
         print(self.sessions)
         if address[0] in self.sessions.keys() and self.sessions[address[0]]['secure']:
@@ -85,54 +89,15 @@ class Server:
         self.send_datagram(dtg, False)
         print("===========================================================")
 
-    def post_user(self, data, session):
-        dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
-        if data['username'] not in self.users.keys():
-            self.users[data['username']] = data
-            app_layer_resp = {'verb': AppVerb.OK}
-        else:
-            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This username already exists in the database."}
-        dtg.set_payload(app_layer_resp)
-        self.send_datagram(dtg, True & dtg.secure)
-
-    def put_user(self, data, session):
-        dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
-        if data['username'] not in self.users.keys():
-            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
-        else:
-            self.users[data['username']] = data
-            app_layer_resp = {'verb': AppVerb.OK, 'message': "Successfully updated."}
-        dtg.set_payload(app_layer_resp)
-        self.send_datagram(dtg, True & dtg.secure)
-
-    def get_user(self, data, session):
-        dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
-        if data['username'] not in self.users.keys():
-            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
-        else:
-            app_layer_resp = {'verb': AppVerb.OK, 'data': self.users[data['username']]}
-        dtg.set_payload(app_layer_resp)
-        self.send_datagram(dtg, True & dtg.secure)
-
-    def delete_user(self, data, session):
-        dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
-        if data['username'] not in self.users.keys():
-            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
-        else:
-            del self.users[data['username']]
-            app_layer_resp = {'verb': AppVerb.OK, 'message': "User deleted."}
-        dtg.set_payload(app_layer_resp)
-        self.send_datagram(dtg, True & dtg.secure)
-
     def handle_app_request(self, payload, session):
         if payload['verb'] == AppVerb.POST:
-            self.post_user(payload['data'], session)
+            self.app.post_user(payload['data'], session)
         elif payload['verb'] == AppVerb.PUT:
-            self.put_user(payload['data'], session)
+            self.app.put_user(payload['data'], session)
         elif payload['verb'] == AppVerb.GET:
-            self.get_user(payload['data'], session)
+            self.app.get_user(payload['data'], session)
         elif payload['verb'] == AppVerb.DELETE:
-            self.delete_user(payload['data'], session)
+            self.app.delete_user(payload['data'], session)
         elif payload['verb'] == AppVerb.CLOSE:
             self.close_session(session)
 

@@ -39,6 +39,7 @@ class Client:
 
     def receive_datagram(self, encryption_enabled):
         recv_dtg, address = self.sock.recvfrom(config.RECV_DATA_SIZE)
+        print(recv_dtg)
         if encryption_enabled:
             cipher = self.AES_ciphers[address[0]]
             recv_dtg = cipher.decrypt(recv_dtg)
