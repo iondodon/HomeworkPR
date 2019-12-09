@@ -5,7 +5,7 @@ import config
 from Crypto.Hash import SHA256
 
 
-def randomString(stringLength=config.AES_KEY_LENGTH):
+def random_string(stringLength=config.AES_KEY_LENGTH):
     """Generate a random string of fixed length """
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))

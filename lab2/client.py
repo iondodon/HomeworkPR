@@ -1,9 +1,10 @@
 import pickle
 import socket
+
+from app import App
 from datagram import Datagram
 from action import TransportAim, AppVerb
 import config
-import req_constructor
 from Crypto.Cipher import AES
 import utils
 
@@ -16,6 +17,8 @@ class Client:
         self.AES_ciphers = {}
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((self.ip, self.port))
+
+        self.app = App(self.ip, self.port, [], self.send_datagram)
 
     def send_datagram(self, dtg, encryption_enabled):
         print("Sending: ", dtg.aim)
@@ -92,20 +95,23 @@ class Client:
         print("===========================================================")
         self.perform_request(session, app_layer_req)
 
+    def run(self):
+        print("===========================================================")
+        choice = input("secure 0/1: ")
+        if choice == '0':
+            secure = False
+        else:
+            secure = True
+        while True:
+            app_layer_req = self.app.construct_app_req()
+            if app_layer_req['verb'] == AppVerb.CLOSE:
+                app_layer_req['data']['server_ip'] = client.ip
+                client.close_session(app_layer_req)
+                break
+            else:
+                client.send_data(app_layer_req, config.LOCALHOST, secure)
+
 
 if __name__ == "__main__":
     client = Client(config.LOCALHOST)
-    print("===========================================================")
-    choice = input("secure 0/1: ")
-    if choice == '0':
-        secure = False
-    else:
-        secure = True
-    while True:
-        app_layer_req = req_constructor.construct_app_req()
-        if app_layer_req['verb'] == AppVerb.CLOSE:
-            app_layer_req['data']['server_ip'] = client.ip
-            client.close_session(app_layer_req)
-            break
-        else:
-            client.send_data(app_layer_req, config.LOCALHOST, secure)
+    client.run()

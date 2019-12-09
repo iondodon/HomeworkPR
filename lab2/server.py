@@ -80,7 +80,7 @@ class Server:
                 'secure': recv_dtg.secure,
             }
             if recv_dtg.secure:
-                session['AES_key'] = utils.randomString()
+                session['AES_key'] = utils.random_string()
                 self.AES_ciphers[recv_dtg.source_ip] = None
                 cipher = AES.new(session['AES_key'].encode(), AES.MODE_ECB)
                 self.AES_ciphers[recv_dtg.source_ip] = cipher
