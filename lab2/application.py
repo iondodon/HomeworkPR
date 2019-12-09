@@ -7,6 +7,12 @@ class Application:
     def __init__(self, gainer):
         self.gainer = gainer
 
+
+class ClientApplication(Application):
+    def __init__(self, gainer):
+        super().__init__(gainer)
+        self.gainer = gainer
+
     def client_perform_request(self, session, app_layer_req):
         dtg = Datagram(
             TransportAim.APP_REQUEST,
@@ -30,22 +36,6 @@ class Application:
         print("===========================================================")
         self.client_perform_request(session, app_layer_req)
 
-    def server_close_session(self, session):
-        print(self.gainer.sessions)
-        dtg = Datagram(
-            TransportAim.APP_RESPONSE,
-            self.gainer.ip,
-            self.gainer.port,
-            session['client_ip'],
-            session['client_port'],
-            session['secure']
-        )
-        app_layer_resp = {'verb': AppVerb.ERR, 'message': "Session closed."}
-        dtg.set_payload(app_layer_resp)
-        self.gainer.transport.send_datagram(dtg)
-        del self.gainer.sessions[session['client_ip']]
-        print(self.gainer.sessions)
-
     def client_close_session(self, app_layer_req):
         server_ip = app_layer_req['data']['server_ip']
         dtg = Datagram(
@@ -62,73 +52,6 @@ class Application:
         print(self.gainer.sessions)
         del self.gainer.sessions[server_ip]
         print(self.gainer.sessions)
-
-    def post_user(self, data, session):
-        dtg = Datagram(
-            TransportAim.APP_RESPONSE,
-            self.gainer.ip,
-            self.gainer.port,
-            session['client_ip'],
-            session['client_port'],
-            session['secure']
-        )
-        if data['username'] not in self.gainer.users.keys():
-            self.gainer.users[data['username']] = data
-            app_layer_resp = {'verb': AppVerb.OK}
-        else:
-            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This username already exists in the database."}
-        dtg.set_payload(app_layer_resp)
-        self.gainer.transport.send_datagram(dtg)
-
-    def put_user(self, data, session):
-        dtg = Datagram(
-            TransportAim.APP_RESPONSE,
-            self.gainer.ip,
-            self.gainer.port,
-            session['client_ip'],
-            session['client_port'],
-            session['secure']
-        )
-        if data['username'] not in self.gainer.users.keys():
-            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
-        else:
-            self.gainer.users[data['username']] = data
-            app_layer_resp = {'verb': AppVerb.OK, 'message': "Successfully updated."}
-        dtg.set_payload(app_layer_resp)
-        self.gainer.transport.send_datagram(dtg)
-
-    def get_user(self, data, session):
-        dtg = Datagram(
-            TransportAim.APP_RESPONSE,
-            self.gainer.ip,
-            self.gainer.port,
-            session['client_ip'],
-            session['client_port'],
-            session['secure']
-        )
-        if data['username'] not in self.gainer.users.keys():
-            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
-        else:
-            app_layer_resp = {'verb': AppVerb.OK, 'data': self.gainer.users[data['username']]}
-        dtg.set_payload(app_layer_resp)
-        self.gainer.transport.send_datagram(dtg)
-
-    def delete_user(self, data, session):
-        dtg = Datagram(
-            TransportAim.APP_RESPONSE,
-            self.gainer.ip,
-            self.gainer.port,
-            session['client_ip'],
-            session['client_port'],
-            session['secure']
-        )
-        if data['username'] not in self.gainer.users.keys():
-            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
-        else:
-            del self.gainer.users[data['username']]
-            app_layer_resp = {'verb': AppVerb.OK, 'message': "User deleted."}
-        dtg.set_payload(app_layer_resp)
-        self.gainer.transport.send_datagram(dtg)
 
     def construct_app_req(self):
         choice = input("""
@@ -167,3 +90,92 @@ class Application:
             app_layer_req['data']['server_ip'] = None
 
         return app_layer_req
+
+
+class ServerApplication(Application):
+    def __init__(self, gainer):
+        super().__init__(gainer)
+        self.gainer = gainer
+
+    def delete_user(self, data, session):
+        dtg = Datagram(
+            TransportAim.APP_RESPONSE,
+            self.gainer.ip,
+            self.gainer.port,
+            session['client_ip'],
+            session['client_port'],
+            session['secure']
+        )
+        if data['username'] not in self.gainer.users.keys():
+            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
+        else:
+            del self.gainer.users[data['username']]
+            app_layer_resp = {'verb': AppVerb.OK, 'message': "User deleted."}
+        dtg.set_payload(app_layer_resp)
+        self.gainer.transport.send_datagram(dtg)
+
+    def get_user(self, data, session):
+        dtg = Datagram(
+            TransportAim.APP_RESPONSE,
+            self.gainer.ip,
+            self.gainer.port,
+            session['client_ip'],
+            session['client_port'],
+            session['secure']
+        )
+        if data['username'] not in self.gainer.users.keys():
+            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
+        else:
+            app_layer_resp = {'verb': AppVerb.OK, 'data': self.gainer.users[data['username']]}
+        dtg.set_payload(app_layer_resp)
+        self.gainer.transport.send_datagram(dtg)
+
+    def put_user(self, data, session):
+        dtg = Datagram(
+            TransportAim.APP_RESPONSE,
+            self.gainer.ip,
+            self.gainer.port,
+            session['client_ip'],
+            session['client_port'],
+            session['secure']
+        )
+        if data['username'] not in self.gainer.users.keys():
+            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
+        else:
+            self.gainer.users[data['username']] = data
+            app_layer_resp = {'verb': AppVerb.OK, 'message': "Successfully updated."}
+        dtg.set_payload(app_layer_resp)
+        self.gainer.transport.send_datagram(dtg)
+
+    def post_user(self, data, session):
+        dtg = Datagram(
+            TransportAim.APP_RESPONSE,
+            self.gainer.ip,
+            self.gainer.port,
+            session['client_ip'],
+            session['client_port'],
+            session['secure']
+        )
+        if data['username'] not in self.gainer.users.keys():
+            self.gainer.users[data['username']] = data
+            app_layer_resp = {'verb': AppVerb.OK}
+        else:
+            app_layer_resp = {'verb': AppVerb.ERR, 'message': "This username already exists in the database."}
+        dtg.set_payload(app_layer_resp)
+        self.gainer.transport.send_datagram(dtg)
+
+    def server_close_session(self, session):
+        print(self.gainer.sessions)
+        dtg = Datagram(
+            TransportAim.APP_RESPONSE,
+            self.gainer.ip,
+            self.gainer.port,
+            session['client_ip'],
+            session['client_port'],
+            session['secure']
+        )
+        app_layer_resp = {'verb': AppVerb.ERR, 'message': "Session closed."}
+        dtg.set_payload(app_layer_resp)
+        self.gainer.transport.send_datagram(dtg)
+        del self.gainer.sessions[session['client_ip']]
+        print(self.gainer.sessions)

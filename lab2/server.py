@@ -2,8 +2,8 @@ import socket
 from concurrent.futures import ThreadPoolExecutor
 import config
 from action import TransportAim, AppVerb
-from application import Application
-from transport import Transport
+from application import ServerApplication
+from transport import ServerTransport
 
 
 class Server:
@@ -19,8 +19,8 @@ class Server:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((self.ip, self.port))
 
-        self.transport = Transport(self)
-        self.application = Application(self)
+        self.transport = ServerTransport(self)
+        self.application = ServerApplication(self)
 
     def handle_app_request(self, payload, session):
         if payload['verb'] == AppVerb.POST:

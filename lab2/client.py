@@ -1,9 +1,8 @@
 import socket
-from application import Application
-from datagram import Datagram
-from action import TransportAim, AppVerb
+from application import ClientApplication
+from action import AppVerb
 import config
-from transport import Transport
+from transport import ClientTransport
 
 
 class Client:
@@ -15,8 +14,8 @@ class Client:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((self.ip, self.port))
 
-        self.transport = Transport(self)
-        self.application = Application(self)
+        self.transport = ClientTransport(self)
+        self.application = ClientApplication(self)
 
     def run(self):
         print("===========================================================")
