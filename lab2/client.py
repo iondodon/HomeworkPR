@@ -16,6 +16,8 @@ class Client:
 
         self.transport = ClientTransport(self)
         self.application = ClientApplication(self)
+        self.transport.set_application(self.application)
+        self.application.set_transport(self.transport)
 
     def run(self):
         print("===========================================================")

@@ -9,6 +9,10 @@ from datagram import Datagram
 class Transport:
     def __init__(self, gainer):
         self.gainer = gainer
+        self.application = None
+
+    def set_application(self, application):
+        self.application = application
 
     def send_datagram(self, dtg):
         print("Sending: ", dtg.aim)
@@ -123,3 +127,11 @@ class ServerTransport(Transport):
             cipher = AES.new(session['AES_key'].encode(), AES.MODE_ECB)
             self.gainer.AES_ciphers[recv_dtg.source_ip] = cipher
         print("===========================================================")
+
+    def process_datagram(self, addr, recv_dtg):
+        if recv_dtg.aim == TransportAim.GET_SESSION:
+            self.propose_session(recv_dtg)
+        elif recv_dtg.aim == TransportAim.APP_REQUEST:
+            self.application.handle_app_request(recv_dtg.get_payload(), self.gainer.sessions[recv_dtg.source_ip])
+        elif recv_dtg.aim == TransportAim.CORRUPTED:
+            print("Message corrupted.")

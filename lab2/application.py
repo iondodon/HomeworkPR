@@ -6,6 +6,10 @@ from datagram import Datagram
 class Application:
     def __init__(self, gainer):
         self.gainer = gainer
+        self.transport = None
+
+    def set_transport(self, transport):
+        self.transport = transport
 
 
 class ClientApplication(Application):
@@ -13,7 +17,13 @@ class ClientApplication(Application):
         super().__init__(gainer)
         self.gainer = gainer
 
-    def client_perform_request(self, session, app_layer_req):
+    def client_send_data(self, app_layer_req, dest_ip):
+        if dest_ip not in self.gainer.sessions.keys():
+            session = self.gainer.transport.get_session(dest_ip)
+            if not session:
+                raise Exception("Could not get a session after several attempts.")
+        session = self.gainer.sessions[dest_ip]
+        print("===========================================================")
         dtg = Datagram(
             TransportAim.APP_REQUEST,
             self.gainer.ip,
@@ -26,15 +36,6 @@ class ClientApplication(Application):
         self.gainer.transport.send_datagram(dtg)
         recv_dtg, address = self.gainer.transport.receive_datagram()
         print("App response:", recv_dtg.get_payload())
-
-    def client_send_data(self, app_layer_req, dest_ip):
-        if dest_ip not in self.gainer.sessions.keys():
-            session = self.gainer.transport.get_session(dest_ip)
-            if not session:
-                raise Exception("Could not get a session after several attempts.")
-        session = self.gainer.sessions[dest_ip]
-        print("===========================================================")
-        self.client_perform_request(session, app_layer_req)
 
     def client_close_session(self, app_layer_req):
         server_ip = app_layer_req['data']['server_ip']
@@ -179,3 +180,15 @@ class ServerApplication(Application):
         self.gainer.transport.send_datagram(dtg)
         del self.gainer.sessions[session['client_ip']]
         print(self.gainer.sessions)
+
+    def handle_app_request(self, payload, session):
+        if payload['verb'] == AppVerb.POST:
+            self.post_user(payload['data'], session)
+        elif payload['verb'] == AppVerb.PUT:
+            self.put_user(payload['data'], session)
+        elif payload['verb'] == AppVerb.GET:
+            self.get_user(payload['data'], session)
+        elif payload['verb'] == AppVerb.DELETE:
+            self.delete_user(payload['data'], session)
+        elif payload['verb'] == AppVerb.CLOSE:
+            self.server_close_session(session)
