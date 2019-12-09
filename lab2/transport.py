@@ -1,11 +1,63 @@
 import pickle
+
+from Crypto.Cipher import AES
+
 import config
 import utils
+from action import TransportAim
+from datagram import Datagram
 
 
 class Transport:
     def __init__(self, gainer):
         self.gainer = gainer
+
+    def get_session(self, dest_ip):
+        dtg = Datagram(
+            TransportAim.GET_SESSION,
+            self.gainer.ip,
+            self.gainer.port,
+            dest_ip,
+            config.SERVER_PORT,
+            True
+        )
+        for i in range(config.GET_SESSION_ATTEMPTS):
+            self.send_datagram(dtg)
+            recv_dtg, address = self.receive_datagram()
+            if recv_dtg and address:
+                self.gainer.sessions[recv_dtg.source_ip] = recv_dtg.get_payload()
+                if self.gainer.sessions[recv_dtg.source_ip]['secure']:
+                    key = self.gainer.sessions[recv_dtg.source_ip]['AES_key']
+                    self.gainer.AES_ciphers[recv_dtg.source_ip] = AES.new(key.encode(), AES.MODE_ECB)
+                return self.gainer.sessions[recv_dtg.source_ip]
+        return None
+
+    def propose_session(self, recv_dtg):
+        dtg = Datagram(
+            TransportAim.SESSION_PROPOSAL,
+            self.gainer.ip,
+            self.gainer.port,
+            recv_dtg.source_ip,
+            recv_dtg.source_port,
+            recv_dtg.secure
+        )
+        if recv_dtg.source_ip in self.gainer.sessions.keys():
+            session = self.gainer.sessions[recv_dtg.source_ip]
+            dtg.set_payload(session)
+            self.send_datagram(dtg)
+        else:
+            session = {'session_id': len(self.gainer.sessions), 'server_ip': self.gainer.ip, 'server_port': self.gainer.port,
+                       'client_ip': recv_dtg.source_ip, 'client_port': recv_dtg.source_port, 'secure': recv_dtg.secure,
+                       'AES_key': utils.random_string()}
+            self.gainer.sessions[session['client_ip']] = session
+
+            dtg.set_payload(session)
+            self.send_datagram(dtg)
+
+            self.gainer.AES_ciphers[recv_dtg.source_ip] = None
+            cipher = AES.new(session['AES_key'].encode(), AES.MODE_ECB)
+            self.gainer.AES_ciphers[recv_dtg.source_ip] = cipher
+        print("===========================================================")
 
     def send_datagram(self, dtg):
         print("Sending: ", dtg.aim)

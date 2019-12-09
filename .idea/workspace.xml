@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5caad95-a756-4775-af3e-457794503977" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab2/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/application.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab2/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab2/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab2/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab2/transport.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/transport.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -145,7 +143,7 @@
       <workItem from="1575452958914" duration="3114000" />
       <workItem from="1575456157958" duration="536000" />
       <workItem from="1575872691665" duration="3394000" />
-      <workItem from="1575886194069" duration="2824000" />
+      <workItem from="1575886194069" duration="3378000" />
     </task>
     <servers />
   </component>
