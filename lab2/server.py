@@ -1,4 +1,3 @@
-import pickle
 import socket
 import utils
 from concurrent.futures import ThreadPoolExecutor
@@ -7,7 +6,6 @@ from action import TransportAim, AppVerb
 from app import App
 from datagram import Datagram
 from Crypto.Cipher import AES
-
 from transport import Transport
 
 
@@ -25,7 +23,7 @@ class Server:
         self.sock.bind((self.ip, self.port))
 
         self.transport = Transport(self)
-        self.app = App(self.ip, self.port, self.users, self.transport.send_datagram)
+        self.app = App(self)
 
     def propose_session(self, recv_dtg):
         dtg = Datagram(TransportAim.SESSION_PROPOSAL, self.ip, self.port, recv_dtg.source_ip, recv_dtg.source_port, recv_dtg.secure)

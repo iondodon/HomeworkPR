@@ -17,7 +17,7 @@ class Client:
         self.sock.bind((self.ip, self.port))
 
         self.transport = Transport(self)
-        self.app = App(self.ip, self.port, [], self.transport.send_datagram)
+        self.app = App(self)
 
     def get_session(self, dest_ip, secure):
         dtg = Datagram(TransportAim.GET_SESSION, self.ip, self.port, dest_ip, config.SERVER_PORT, secure)
