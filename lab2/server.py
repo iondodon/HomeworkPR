@@ -8,6 +8,8 @@ from app import App
 from datagram import Datagram
 from Crypto.Cipher import AES
 
+from transport import Transport
+
 
 class Server:
     def __init__(self, ip):
@@ -22,36 +24,15 @@ class Server:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((self.ip, self.port))
 
-        self.app = App(self.ip, self.port, self.users, self.send_datagram)
-
-    def send_datagram(self, dtg):
-        print("Sending: ", dtg.aim)
-        dest_ip = dtg.dest_ip
-        dest_port = dtg.dest_port
-        dtg: bytes = pickle.dumps(dtg)
-        if dest_ip in self.AES_ciphers.keys():
-            cipher = self.AES_ciphers[dest_ip]
-            dtg = utils.append_zs(dtg)
-            dtg = cipher.encrypt(dtg)
-        self.sock.sendto(dtg, (dest_ip, dest_port))
-
-    def receive_datagram(self):
-        recv_dtg, address = self.sock.recvfrom(config.RECV_DATA_SIZE)
-        print(recv_dtg)
-        print(self.sessions)
-        if address[0] in self.AES_ciphers.keys():
-            cipher = self.AES_ciphers[address[0]]
-            recv_dtg = cipher.decrypt(recv_dtg)
-        recv_dtg = pickle.loads(recv_dtg)
-        print("Received: ", recv_dtg.aim)
-        return recv_dtg, address
+        self.transport = Transport(self)
+        self.app = App(self.ip, self.port, self.users, self.transport.send_datagram)
 
     def propose_session(self, recv_dtg):
         dtg = Datagram(TransportAim.SESSION_PROPOSAL, self.ip, self.port, recv_dtg.source_ip, recv_dtg.source_port, recv_dtg.secure)
         if recv_dtg.source_ip in self.sessions.keys():
             session = self.sessions[recv_dtg.source_ip]
             dtg.set_payload(session)
-            self.send_datagram(dtg)
+            self.transport.send_datagram(dtg)
         else:
             session = {'session_id': len(self.sessions), 'server_ip': self.ip, 'server_port': self.port,
                        'client_ip': recv_dtg.source_ip, 'client_port': recv_dtg.source_port, 'secure': recv_dtg.secure,
@@ -59,7 +40,7 @@ class Server:
             self.sessions[session['client_ip']] = session
 
             dtg.set_payload(session)
-            self.send_datagram(dtg)
+            self.transport.send_datagram(dtg)
 
             self.AES_ciphers[recv_dtg.source_ip] = None
             cipher = AES.new(session['AES_key'].encode(), AES.MODE_ECB)
@@ -91,14 +72,14 @@ class Server:
         dtg = Datagram(TransportAim.APP_RESPONSE, self.ip, self.port, session['client_ip'], session['client_port'], session['secure'])
         app_layer_resp = {'verb': AppVerb.ERR, 'message': "Session closed."}
         dtg.set_payload(app_layer_resp)
-        self.send_datagram(dtg)
+        self.transport.send_datagram(dtg)
         del self.sessions[session['client_ip']]
         print(self.sessions)
 
     def listen(self):
         while True:
             print("===========================================================")
-            recv_dtg, addr = self.receive_datagram()
+            recv_dtg, addr = self.transport.receive_datagram()
             self.executor.submit(self.process_datagram, addr, recv_dtg)
 
 

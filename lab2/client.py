@@ -1,12 +1,10 @@
-import pickle
 import socket
-
 from app import App
 from datagram import Datagram
 from action import TransportAim, AppVerb
 import config
 from Crypto.Cipher import AES
-import utils
+from transport import Transport
 
 
 class Client:
@@ -18,35 +16,14 @@ class Client:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((self.ip, self.port))
 
-        self.app = App(self.ip, self.port, [], self.send_datagram)
-
-    def send_datagram(self, dtg):
-        print("Sending: ", dtg.aim)
-        dest_ip = dtg.dest_ip
-        dest_port = dtg.dest_port
-        dtg: bytes = pickle.dumps(dtg)
-        if dest_ip in self.AES_ciphers.keys():
-            cipher = self.AES_ciphers[dest_ip]
-            dtg = utils.append_zs(dtg)
-            dtg = cipher.encrypt(dtg)
-        self.sock.sendto(dtg, (dest_ip, dest_port))
-
-    def receive_datagram(self):
-        recv_dtg, address = self.sock.recvfrom(config.RECV_DATA_SIZE)
-        print(recv_dtg)
-        print(self.sessions)
-        if address[0] in self.AES_ciphers.keys():
-            cipher = self.AES_ciphers[address[0]]
-            recv_dtg = cipher.decrypt(recv_dtg)
-        recv_dtg = pickle.loads(recv_dtg)
-        print("Received: ", recv_dtg.aim)
-        return recv_dtg, address
+        self.transport = Transport(self)
+        self.app = App(self.ip, self.port, [], self.transport.send_datagram)
 
     def get_session(self, dest_ip, secure):
         dtg = Datagram(TransportAim.GET_SESSION, self.ip, self.port, dest_ip, config.SERVER_PORT, secure)
         for i in range(config.GET_SESSION_ATTEMPTS):
-            self.send_datagram(dtg)
-            recv_dtg, address = self.receive_datagram()
+            self.transport.send_datagram(dtg)
+            recv_dtg, address = self.transport.receive_datagram()
             if recv_dtg and address:
                 self.sessions[recv_dtg.source_ip] = recv_dtg.get_payload()
                 if self.sessions[recv_dtg.source_ip]['secure']:
@@ -58,8 +35,8 @@ class Client:
     def perform_request(self, session, app_layer_req):
         dtg = Datagram(TransportAim.APP_REQUEST, self.ip, self.port, session['server_ip'], config.SERVER_PORT, session['secure'])
         dtg.set_payload(app_layer_req)
-        self.send_datagram(dtg)
-        recv_dtg, address = self.receive_datagram()
+        self.transport.send_datagram(dtg)
+        recv_dtg, address = self.transport.receive_datagram()
         print("App response:", recv_dtg.get_payload())
 
     def close_session(self, app_layer_req):
@@ -72,8 +49,8 @@ class Client:
             self.sessions[server_ip]['secure']
         )
         dtg.set_payload(app_layer_req)
-        self.send_datagram(dtg)
-        dtg, address = self.receive_datagram()
+        self.transport.send_datagram(dtg)
+        dtg, address = self.transport.receive_datagram()
         print(dtg.aim)
         print(self.sessions)
         del self.sessions[server_ip]
