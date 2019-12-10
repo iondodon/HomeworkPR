@@ -25,7 +25,6 @@ class Server:
 
     def listen(self):
         while True:
-            print("===========================================================")
             recv_dtg, addr = self.transport.receive_datagram()
             # self.executor.submit(self.process_datagram, addr, recv_dtg)
             self.transport.process_datagram(addr, recv_dtg)

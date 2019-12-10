@@ -19,6 +19,7 @@ def append_zs(data: bytes):
 
 def valid_cksm(payload, recv_cksm):
     if payload is None:
+        print("No payload received.")
         return True
 
     hash_obj = SHA256.new(pickle.dumps(payload))
@@ -28,3 +29,7 @@ def valid_cksm(payload, recv_cksm):
     print("Calc cksm: ", hash_obj.hexdigest())
 
     return True
+
+
+def write(action, text):
+    print(config.color_start + action + config.color_end, text)

@@ -4,6 +4,7 @@ import config
 import utils
 from action import TransportAim
 from datagram import Datagram
+import time
 
 
 class Transport:
@@ -15,7 +16,9 @@ class Transport:
         self.application = application
 
     def send_datagram(self, dtg):
-        print("Sending: ", dtg.aim)
+        time.sleep(10)
+        print("=====================================================================")
+        utils.write("Sending: ", dtg.aim)
         dest_ip = dtg.dest_ip
         dest_port = dtg.dest_port
         dtg: bytes = pickle.dumps(dtg)
@@ -25,47 +28,57 @@ class Transport:
             dtg = cipher.encrypt(dtg)
 
         while True:
-            print("Waiting for ack")
+            utils.write("Waiting for ack", "")
             self.gainer.sock.sendto(dtg, (dest_ip, dest_port))
-            recv_dtg, address = self.gainer.sock.recvfrom(config.RECV_DATA_SIZE)
-            print("Received ack")
-            print(recv_dtg)
+            ack_dtg, address = self.gainer.sock.recvfrom(config.RECV_DATA_SIZE)
+            utils.write("Received ack", "")
             if dest_ip in self.gainer.AES_ciphers.keys():
+                utils.write("Encrypted ack: ", ack_dtg)
                 cipher = self.gainer.AES_ciphers[dest_ip]
-                recv_dtg = cipher.decrypt(recv_dtg)
-            recv_dtg: Datagram = pickle.loads(recv_dtg)
-            print(recv_dtg.aim)
-            if recv_dtg.aim == TransportAim.OK:
+                ack_dtg = cipher.decrypt(ack_dtg)
+            ack_dtg: Datagram = pickle.loads(ack_dtg)
+            utils.write("Received ack: ", ack_dtg)
+            utils.write("Received ack aim: ", ack_dtg.aim)
+            if ack_dtg.aim == TransportAim.OK:
                 break
+        print("=====================================================================")
 
     def receive_datagram(self):
+        time.sleep(10)
+        print("=====================================================================")
         recv_dtg, address = self.gainer.sock.recvfrom(config.RECV_DATA_SIZE)
-        print(recv_dtg)
+        utils.write("Received dtg: ", recv_dtg)
         if address[0] in self.gainer.AES_ciphers.keys():
             cipher = self.gainer.AES_ciphers[address[0]]
             recv_dtg = cipher.decrypt(recv_dtg)
+            utils.write("Decrypted recv dtg: ", recv_dtg)
         recv_dtg: Datagram = pickle.loads(recv_dtg)
-        print("Received: ", recv_dtg.aim)
+        utils.write("Received dtg aim: ", recv_dtg.aim)
 
-        print("Sending ack")
+        time.sleep(5)
+
+        utils.write("Sending ack", "")
         if utils.valid_cksm(recv_dtg.get_payload(), recv_dtg.get_cksm()):
             aim = TransportAim.OK
         else:
             aim = TransportAim.CORRUPTED
-        dtg = Datagram(
+        utils.write("Sending as ack: ", aim)
+        ack_dtg = Datagram(
             aim,
             self.gainer.ip,
             self.gainer.port,
             recv_dtg.source_ip,
             recv_dtg.source_port
         )
-        dtg = pickle.dumps(dtg)
+        ack_dtg = pickle.dumps(ack_dtg)
+        utils.write("Ack dtg encoded: ", ack_dtg)
         if address[0] in self.gainer.AES_ciphers.keys():
             cipher = self.gainer.AES_ciphers[address[0]]
-            dtg = utils.append_zs(dtg)
-            dtg = cipher.encrypt(dtg)
-        self.gainer.sock.sendto(dtg, address)
-
+            ack_dtg = utils.append_zs(ack_dtg)
+            ack_dtg = cipher.encrypt(ack_dtg)
+            utils.write("Encrypted ack dtg: ", ack_dtg)
+        self.gainer.sock.sendto(ack_dtg, address)
+        print("=====================================================================")
         return recv_dtg, address
 
 
@@ -121,7 +134,6 @@ class ServerTransport(Transport):
             self.gainer.AES_ciphers[recv_dtg.source_ip] = None
             cipher = AES.new(session['AES_key'].encode(), AES.MODE_ECB)
             self.gainer.AES_ciphers[recv_dtg.source_ip] = cipher
-        print("===========================================================")
 
     def process_datagram(self, addr, recv_dtg):
         if recv_dtg.aim == TransportAim.GET_SESSION:

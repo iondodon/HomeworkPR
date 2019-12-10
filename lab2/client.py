@@ -20,7 +20,6 @@ class Client:
         self.application.set_transport(self.transport)
 
     def run(self):
-        print("===========================================================")
         while True:
             app_layer_req = self.application.construct_app_req()
             if app_layer_req['verb'] == AppVerb.CLOSE:

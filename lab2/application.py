@@ -160,7 +160,7 @@ class ServerApplication(Application):
         self.gainer.transport.send_datagram(dtg)
 
     def server_close_session(self, session):
-        print(self.gainer.sessions)
+        print("Before closing session:", self.gainer.sessions)
         dtg = Datagram(
             TransportAim.APP_RESPONSE,
             self.gainer.ip,
@@ -172,7 +172,7 @@ class ServerApplication(Application):
         dtg.set_payload(app_layer_resp)
         self.gainer.transport.send_datagram(dtg)
         del self.gainer.sessions[session['client_ip']]
-        print(self.gainer.sessions)
+        print("After closing session:", self.gainer.sessions)
 
     def handle_app_request(self, payload, session):
         if payload['verb'] == AppVerb.POST:

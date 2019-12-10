@@ -5,3 +5,6 @@ LOCALHOST = "127.0.0.1"
 MAX_WORKERS = 100
 RECV_DATA_SIZE = 1024
 AES_KEY_LENGTH = 16
+
+color_start = '\x1b[6;30;42m'
+color_end = '\x1b[0m'
