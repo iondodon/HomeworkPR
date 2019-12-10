@@ -1,7 +1,6 @@
 import socket
 from concurrent.futures import ThreadPoolExecutor
 import config
-from action import TransportAim, AppVerb
 from application import ServerApplication
 from transport import ServerTransport
 

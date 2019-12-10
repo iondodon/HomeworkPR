@@ -4,6 +4,7 @@ import config
 import utils
 from action import TransportAim
 from datagram import Datagram
+import time
 
 
 class Transport:
@@ -15,6 +16,7 @@ class Transport:
         self.application = application
 
     def send_datagram(self, dtg):
+        time.sleep(5)
         print("Sending: ", dtg.aim)
         dest_ip = dtg.dest_ip
         dest_port = dtg.dest_port
@@ -30,15 +32,17 @@ class Transport:
             recv_dtg, address = self.gainer.sock.recvfrom(config.RECV_DATA_SIZE)
             print("Received ack")
             print(recv_dtg)
-            # if dest_ip in self.gainer.AES_ciphers.keys():
-            #     cipher = self.gainer.AES_ciphers[dest_ip]
-            #     recv_dtg = cipher.decrypt(recv_dtg)
+            if dest_ip in self.gainer.AES_ciphers.keys():
+                cipher = self.gainer.AES_ciphers[dest_ip]
+                print(cipher)
+                recv_dtg = cipher.decrypt(recv_dtg)
             recv_dtg: Datagram = pickle.loads(recv_dtg)
             print(recv_dtg.aim)
             if recv_dtg.aim == TransportAim.OK:
                 break
 
     def receive_datagram(self):
+        time.sleep(5)
         recv_dtg, address = self.gainer.sock.recvfrom(config.RECV_DATA_SIZE)
         print(recv_dtg)
         if address[0] in self.gainer.AES_ciphers.keys():
@@ -47,6 +51,7 @@ class Transport:
         recv_dtg: Datagram = pickle.loads(recv_dtg)
         print("Received: ", recv_dtg.aim)
 
+        time.sleep(5)
         print("Sending ack")
         if utils.valid_cksm(recv_dtg.get_payload(), recv_dtg.get_cksm()):
             aim = TransportAim.OK
@@ -61,10 +66,10 @@ class Transport:
             recv_dtg.secure
         )
         dtg = pickle.dumps(dtg)
-        # if address[0] in self.gainer.AES_ciphers.keys():
-        #     cipher = self.gainer.AES_ciphers[address[0]]
-        #     dtg = utils.append_zs(dtg)
-        #     dtg = cipher.decrypt(dtg)
+        if address[0] in self.gainer.AES_ciphers.keys():
+            cipher = self.gainer.AES_ciphers[address[0]]
+            dtg = utils.append_zs(dtg)
+            dtg = cipher.encrypt(dtg)
         self.gainer.sock.sendto(dtg, address)
 
         return recv_dtg, address

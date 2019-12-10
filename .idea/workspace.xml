@@ -3,8 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="a5caad95-a756-4775-af3e-457794503977" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab2/application.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/application.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lab2/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab2/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab2/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/server.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lab2/transport.py" beforeDir="false" afterPath="$PROJECT_DIR$/lab2/transport.py" afterDir="false" />
     </list>
@@ -146,7 +145,8 @@
       <workItem from="1575456157958" duration="536000" />
       <workItem from="1575872691665" duration="3394000" />
       <workItem from="1575886194069" duration="8033000" />
-      <workItem from="1575915321812" duration="4281000" />
+      <workItem from="1575915321812" duration="5258000" />
+      <workItem from="1575975215988" duration="1279000" />
     </task>
     <servers />
   </component>
