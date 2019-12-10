@@ -8,6 +8,7 @@ class TransportAim(Enum):
     APP_RESPONSE = 4
     CORRUPTED = 5
     OK = 6
+    CLOSE = 7
 
 
 class AppVerb(Enum):

@@ -36,21 +36,21 @@ class ClientApplication(Application):
         recv_dtg, address = self.gainer.transport.receive_datagram()
         print("App response:", recv_dtg.get_payload())
 
-    def client_close_session(self, app_layer_req):
-        server_ip = app_layer_req['data']['server_ip']
-        dtg = Datagram(
-            TransportAim.APP_REQUEST,
-            self.gainer.ip, self.gainer.port,
-            self.gainer.sessions[server_ip]['server_ip'],
-            self.gainer.sessions[server_ip]['server_port']
-        )
-        dtg.set_payload(app_layer_req)
-        self.gainer.transport.send_datagram(dtg)
-        dtg, address = self.gainer.transport.receive_datagram()
-        print(dtg.aim)
-        print(self.gainer.sessions)
-        del self.gainer.sessions[server_ip]
-        print(self.gainer.sessions)
+    # def client_close_session(self, app_layer_req):
+    #     server_ip = app_layer_req['data']['server_ip']
+    #     dtg = Datagram(
+    #         TransportAim.APP_REQUEST,
+    #         self.gainer.ip, self.gainer.port,
+    #         self.gainer.sessions[server_ip]['server_ip'],
+    #         self.gainer.sessions[server_ip]['server_port']
+    #     )
+    #     dtg.set_payload(app_layer_req)
+    #     self.gainer.transport.send_datagram(dtg)
+    #     dtg, address = self.gainer.transport.receive_datagram()
+    #     print(dtg.aim)
+    #     print(self.gainer.sessions)
+    #     del self.gainer.sessions[server_ip]
+    #     print(self.gainer.sessions)
 
     def construct_app_req(self):
         choice = input("""
@@ -159,20 +159,20 @@ class ServerApplication(Application):
         dtg.set_payload(app_layer_resp)
         self.gainer.transport.send_datagram(dtg)
 
-    def server_close_session(self, session):
-        print("Before closing session:", self.gainer.sessions)
-        dtg = Datagram(
-            TransportAim.APP_RESPONSE,
-            self.gainer.ip,
-            self.gainer.port,
-            session['client_ip'],
-            session['client_port']
-        )
-        app_layer_resp = {'verb': AppVerb.ERR, 'message': "Session closed."}
-        dtg.set_payload(app_layer_resp)
-        self.gainer.transport.send_datagram(dtg)
-        del self.gainer.sessions[session['client_ip']]
-        print("After closing session:", self.gainer.sessions)
+    # def server_close_session(self, session):
+    #     print("Before closing session:", self.gainer.sessions)
+    #     dtg = Datagram(
+    #         TransportAim.APP_RESPONSE,
+    #         self.gainer.ip,
+    #         self.gainer.port,
+    #         session['client_ip'],
+    #         session['client_port']
+    #     )
+    #     app_layer_resp = {'verb': AppVerb.ERR, 'message': "Session closed."}
+    #     dtg.set_payload(app_layer_resp)
+    #     self.gainer.transport.send_datagram(dtg)
+    #     del self.gainer.sessions[session['client_ip']]
+    #     print("After closing session:", self.gainer.sessions)
 
     def handle_app_request(self, payload, session):
         if payload['verb'] == AppVerb.POST:

@@ -24,7 +24,7 @@ class Client:
             app_layer_req = self.application.construct_app_req()
             if app_layer_req['verb'] == AppVerb.CLOSE:
                 app_layer_req['data']['server_ip'] = self.ip
-                self.application.client_close_session(app_layer_req)
+                self.transport.client_close_session(app_layer_req)
                 break
             else:
                 self.application.client_send_data(app_layer_req, config.LOCALHOST)
