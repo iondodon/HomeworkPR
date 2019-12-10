@@ -4,7 +4,6 @@ import config
 import utils
 from action import TransportAim
 from datagram import Datagram
-import time
 
 
 class Transport:
@@ -16,7 +15,6 @@ class Transport:
         self.application = application
 
     def send_datagram(self, dtg):
-        time.sleep(5)
         print("Sending: ", dtg.aim)
         dest_ip = dtg.dest_ip
         dest_port = dtg.dest_port
@@ -34,7 +32,6 @@ class Transport:
             print(recv_dtg)
             if dest_ip in self.gainer.AES_ciphers.keys():
                 cipher = self.gainer.AES_ciphers[dest_ip]
-                print(cipher)
                 recv_dtg = cipher.decrypt(recv_dtg)
             recv_dtg: Datagram = pickle.loads(recv_dtg)
             print(recv_dtg.aim)
@@ -42,7 +39,6 @@ class Transport:
                 break
 
     def receive_datagram(self):
-        time.sleep(5)
         recv_dtg, address = self.gainer.sock.recvfrom(config.RECV_DATA_SIZE)
         print(recv_dtg)
         if address[0] in self.gainer.AES_ciphers.keys():
@@ -51,7 +47,6 @@ class Transport:
         recv_dtg: Datagram = pickle.loads(recv_dtg)
         print("Received: ", recv_dtg.aim)
 
-        time.sleep(5)
         print("Sending ack")
         if utils.valid_cksm(recv_dtg.get_payload(), recv_dtg.get_cksm()):
             aim = TransportAim.OK
@@ -62,8 +57,7 @@ class Transport:
             self.gainer.ip,
             self.gainer.port,
             recv_dtg.source_ip,
-            recv_dtg.source_port,
-            recv_dtg.secure
+            recv_dtg.source_port
         )
         dtg = pickle.dumps(dtg)
         if address[0] in self.gainer.AES_ciphers.keys():
@@ -86,17 +80,15 @@ class ClientTransport(Transport):
             self.gainer.ip,
             self.gainer.port,
             dest_ip,
-            config.SERVER_PORT,
-            True
+            config.SERVER_PORT
         )
         for i in range(config.GET_SESSION_ATTEMPTS):
             self.send_datagram(dtg)
             recv_dtg, address = self.receive_datagram()
             if recv_dtg and address:
                 self.gainer.sessions[recv_dtg.source_ip] = recv_dtg.get_payload()
-                if self.gainer.sessions[recv_dtg.source_ip]['secure']:
-                    key = self.gainer.sessions[recv_dtg.source_ip]['AES_key']
-                    self.gainer.AES_ciphers[recv_dtg.source_ip] = AES.new(key.encode(), AES.MODE_ECB)
+                key = self.gainer.sessions[recv_dtg.source_ip]['AES_key']
+                self.gainer.AES_ciphers[recv_dtg.source_ip] = AES.new(key.encode(), AES.MODE_ECB)
                 return self.gainer.sessions[recv_dtg.source_ip]
         return None
 
@@ -112,8 +104,7 @@ class ServerTransport(Transport):
             self.gainer.ip,
             self.gainer.port,
             recv_dtg.source_ip,
-            recv_dtg.source_port,
-            recv_dtg.secure
+            recv_dtg.source_port
         )
         if recv_dtg.source_ip in self.gainer.sessions.keys():
             session = self.gainer.sessions[recv_dtg.source_ip]
@@ -121,8 +112,7 @@ class ServerTransport(Transport):
             self.send_datagram(dtg)
         else:
             session = {'session_id': len(self.gainer.sessions), 'server_ip': self.gainer.ip, 'server_port': self.gainer.port,
-                       'client_ip': recv_dtg.source_ip, 'client_port': recv_dtg.source_port, 'secure': recv_dtg.secure,
-                       'AES_key': utils.random_string()}
+                       'client_ip': recv_dtg.source_ip, 'client_port': recv_dtg.source_port, 'AES_key': utils.random_string()}
             self.gainer.sessions[session['client_ip']] = session
 
             dtg.set_payload(session)

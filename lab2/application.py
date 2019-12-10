@@ -29,8 +29,7 @@ class ClientApplication(Application):
             self.gainer.ip,
             self.gainer.port,
             session['server_ip'],
-            config.SERVER_PORT,
-            session['secure']
+            config.SERVER_PORT
         )
         dtg.set_payload(app_layer_req)
         self.gainer.transport.send_datagram(dtg)
@@ -43,8 +42,7 @@ class ClientApplication(Application):
             TransportAim.APP_REQUEST,
             self.gainer.ip, self.gainer.port,
             self.gainer.sessions[server_ip]['server_ip'],
-            self.gainer.sessions[server_ip]['server_port'],
-            self.gainer.sessions[server_ip]['secure']
+            self.gainer.sessions[server_ip]['server_port']
         )
         dtg.set_payload(app_layer_req)
         self.gainer.transport.send_datagram(dtg)
@@ -104,8 +102,7 @@ class ServerApplication(Application):
             self.gainer.ip,
             self.gainer.port,
             session['client_ip'],
-            session['client_port'],
-            session['secure']
+            session['client_port']
         )
         if data['username'] not in self.gainer.users.keys():
             app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
@@ -121,8 +118,7 @@ class ServerApplication(Application):
             self.gainer.ip,
             self.gainer.port,
             session['client_ip'],
-            session['client_port'],
-            session['secure']
+            session['client_port']
         )
         if data['username'] not in self.gainer.users.keys():
             app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
@@ -137,8 +133,7 @@ class ServerApplication(Application):
             self.gainer.ip,
             self.gainer.port,
             session['client_ip'],
-            session['client_port'],
-            session['secure']
+            session['client_port']
         )
         if data['username'] not in self.gainer.users.keys():
             app_layer_resp = {'verb': AppVerb.ERR, 'message': "This user doe not exists in the database."}
@@ -154,8 +149,7 @@ class ServerApplication(Application):
             self.gainer.ip,
             self.gainer.port,
             session['client_ip'],
-            session['client_port'],
-            session['secure']
+            session['client_port']
         )
         if data['username'] not in self.gainer.users.keys():
             self.gainer.users[data['username']] = data
@@ -172,8 +166,7 @@ class ServerApplication(Application):
             self.gainer.ip,
             self.gainer.port,
             session['client_ip'],
-            session['client_port'],
-            session['secure']
+            session['client_port']
         )
         app_layer_resp = {'verb': AppVerb.ERR, 'message': "Session closed."}
         dtg.set_payload(app_layer_resp)
